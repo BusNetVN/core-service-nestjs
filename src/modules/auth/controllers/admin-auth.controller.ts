@@ -1,19 +1,27 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Req,
+} from '@nestjs/common';
 import type { Request } from 'express';
 import { Public } from '../../../common/decorators/public.decorator.js';
-import { AdminLoginDto } from '../dto/admin-login.dto.js';
-import { RefreshTokenDto } from '../dto/refresh-token.dto.js';
-import { AdminLoginUseCase } from '../usecases/admin-login.usecase.js';
-import { LogoutUseCase } from '../usecases/logout.usecase.js';
-import { RefreshTokenUseCase } from '../usecases/refresh-token.usecase.js';
-import { clientInfo } from '../utils/session-token.js';
+import { AdminLoginDto } from '../dto/admin/admin-login.dto.js';
+import { AdminRefreshTokenDto } from '../dto/admin/admin-refresh-token.dto.js';
+import { AdminLoginUseCase } from '../usecases/admin/admin-login.usecase.js';
+import { AdminLogoutUseCase } from '../usecases/admin/admin-logout.usecase.js';
+import { AdminRefreshTokenUseCase } from '../usecases/admin/admin-refresh-token.usecase.js';
+import { clientInfo } from '../utils/admin/admin-session-token.js';
 
+/** Đăng nhập cho trang quản trị (bnv-admin), prefix: /api/admin/auth. Chỉ tài khoản SYSTEM_ADMIN. */
 @Controller('admin/auth')
 export class AdminAuthController {
   constructor(
     private readonly adminLogin: AdminLoginUseCase,
-    private readonly refreshToken: RefreshTokenUseCase,
-    private readonly logoutSession: LogoutUseCase,
+    private readonly refreshToken: AdminRefreshTokenUseCase,
+    private readonly logoutSession: AdminLogoutUseCase,
   ) {}
 
   @Post('login')
@@ -26,14 +34,14 @@ export class AdminAuthController {
   @Post('refresh')
   @Public()
   @HttpCode(HttpStatus.OK)
-  refresh(@Body() dto: RefreshTokenDto) {
+  refresh(@Body() dto: AdminRefreshTokenDto) {
     return this.refreshToken.execute(dto);
   }
 
   @Post('logout')
   @Public()
   @HttpCode(HttpStatus.NO_CONTENT)
-  async logout(@Body() dto: RefreshTokenDto) {
+  async logout(@Body() dto: AdminRefreshTokenDto) {
     await this.logoutSession.execute(dto);
   }
 }

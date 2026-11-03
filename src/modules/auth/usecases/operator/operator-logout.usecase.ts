@@ -1,19 +1,22 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { TokenService } from '../../../common/services/token.service.js';
-import { RefreshTokenDto } from '../dto/refresh-token.dto.js';
-import { SessionRevokeReason } from '../enums/session-revoke-reason.enum.js';
-import { AuthSessionRepository } from '../repository/auth-session.repository.js';
-import { hashRefreshToken, sameHash } from '../utils/session-token.js';
+import { TokenService } from '../../../../common/services/token.service.js';
+import { OperatorRefreshTokenDto } from '../../dto/operator/operator-refresh-token.dto.js';
+import { SessionRevokeReason } from '../../enums/session-revoke-reason.enum.js';
+import { OperatorAuthSessionRepository } from '../../repository/operator/operator-auth-session.repository.js';
+import {
+  hashRefreshToken,
+  sameHash,
+} from '../../utils/operator/operator-session-token.js';
 
 /** Idempotent: an unknown, expired or already revoked token is simply ignored. */
 @Injectable()
-export class LogoutUseCase {
+export class OperatorLogoutUseCase {
   constructor(
-    private readonly sessions: AuthSessionRepository,
+    private readonly sessions: OperatorAuthSessionRepository,
     private readonly tokens: TokenService,
   ) {}
 
-  async execute(dto: RefreshTokenDto) {
+  async execute(dto: OperatorRefreshTokenDto) {
     const payload = await this.tokens
       .verifyRefresh(dto.refresh_token, { ignoreExpiration: true })
       .catch((error: unknown) => {

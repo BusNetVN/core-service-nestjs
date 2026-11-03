@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { OfficeRepository } from '../../offices/repository/office.repository.js';
+import { OperatorOfficeRepository } from '../../offices/repository/operator/operator-office.repository.js';
 import { UpdateVehicleDto } from '../dto/update-vehicle.dto.js';
 import { Vehicle } from '../entities/vehicle.entity.js';
 import {
@@ -13,7 +13,7 @@ import { resolveVehicleRefs } from './resolve-vehicle-refs.js';
 export class UpdateVehicleUseCase {
   constructor(
     private readonly vehicles: VehicleRepository,
-    private readonly offices: OfficeRepository,
+    private readonly offices: OperatorOfficeRepository,
   ) {}
 
   async execute(uuid: string, dto: UpdateVehicleDto) {
@@ -30,7 +30,11 @@ export class UpdateVehicleUseCase {
 
     if (license_plate) {
       const plate = normalizeLicensePlate(license_plate);
-      await this.vehicles.assertUniquePlate(vehicle.company_id, plate, vehicle.id);
+      await this.vehicles.assertUniquePlate(
+        vehicle.company_id,
+        plate,
+        vehicle.id,
+      );
       fields.license_plate = plate;
     }
 

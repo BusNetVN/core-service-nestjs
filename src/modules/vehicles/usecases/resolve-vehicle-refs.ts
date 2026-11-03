@@ -1,12 +1,12 @@
 import { BadRequestException } from '@nestjs/common';
-import type { OfficeRepository } from '../../offices/repository/office.repository.js';
+import type { OperatorOfficeRepository } from '../../offices/repository/operator/operator-office.repository.js';
 import { Vehicle } from '../entities/vehicle.entity.js';
 
 // Returns the office relation only when `office_uuid` is present; null clears it.
 export async function resolveVehicleRefs(
   companyId: string,
   refs: { office_uuid?: string | null },
-  offices: OfficeRepository,
+  offices: OperatorOfficeRepository,
 ): Promise<Partial<Vehicle>> {
   if (refs.office_uuid === undefined) {
     return {};

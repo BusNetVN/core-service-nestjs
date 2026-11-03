@@ -22,6 +22,9 @@ export type ClientInfo = {
 export function clientInfo(request: Request): ClientInfo {
   return {
     ip_address: (request.get('x-real-ip') ?? request.ip ?? '').slice(0, 64),
-    user_agent: (request.get('user-agent') ?? '').slice(0, USER_AGENT_MAX_LENGTH),
+    user_agent: (request.get('user-agent') ?? '').slice(
+      0,
+      USER_AGENT_MAX_LENGTH,
+    ),
   };
 }

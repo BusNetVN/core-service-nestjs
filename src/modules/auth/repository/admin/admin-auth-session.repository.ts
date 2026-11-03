@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Repository } from 'typeorm';
-import { AuthSession } from '../entities/auth-session.entity.js';
-import type { SessionRevokeReasonValue } from '../enums/session-revoke-reason.enum.js';
+import { AuthSession } from '../../entities/auth-session.entity.js';
+import type { SessionRevokeReasonValue } from '../../enums/session-revoke-reason.enum.js';
 
+/** Login sessions of bnv-admin (tbl_auth_sessions). */
 @Injectable()
-export class AuthSessionRepository {
+export class AdminAuthSessionRepository {
   constructor(
     @InjectRepository(AuthSession)
     private readonly sessions: Repository<AuthSession>,

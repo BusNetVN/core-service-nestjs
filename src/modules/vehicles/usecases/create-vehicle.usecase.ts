@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CompanyRepository } from '../../companies/repository/company.repository.js';
-import { OfficeRepository } from '../../offices/repository/office.repository.js';
+import { OperatorOfficeRepository } from '../../offices/repository/operator/operator-office.repository.js';
 import { CreateVehicleDto } from '../dto/create-vehicle.dto.js';
 import { VehicleCondition, VehicleStatus } from '../enums/vehicle.enum.js';
 import {
@@ -15,7 +15,7 @@ export class CreateVehicleUseCase {
   constructor(
     private readonly vehicles: VehicleRepository,
     private readonly companies: CompanyRepository,
-    private readonly offices: OfficeRepository,
+    private readonly offices: OperatorOfficeRepository,
   ) {}
 
   async execute(dto: CreateVehicleDto) {

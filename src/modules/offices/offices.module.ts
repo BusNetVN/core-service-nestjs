@@ -5,7 +5,8 @@ import { Company } from '../companies/entities/company.entity.js';
 import { AdminOfficeController } from './controllers/admin-office.controller.js';
 import { OperatorOfficeController } from './controllers/operator-office.controller.js';
 import { Office } from './entities/office.entity.js';
-import { OfficeRepository } from './repository/office.repository.js';
+import { AdminOfficeRepository } from './repository/admin/admin-office.repository.js';
+import { OperatorOfficeRepository } from './repository/operator/operator-office.repository.js';
 import { AdminCreateOfficeUseCase } from './usecases/admin/admin-create-office.usecase.js';
 import { AdminDeleteOfficeUseCase } from './usecases/admin/admin-delete-office.usecase.js';
 import { AdminFindAllOfficesUseCase } from './usecases/admin/admin-find-all-office.usecase.js';
@@ -21,7 +22,8 @@ import { OperatorUpdateOfficeUseCase } from './usecases/operator/operator-update
   imports: [TypeOrmModule.forFeature([Office, Company]), CompaniesModule],
   controllers: [AdminOfficeController, OperatorOfficeController],
   providers: [
-    OfficeRepository,
+    AdminOfficeRepository,
+    OperatorOfficeRepository,
     AdminFindAllOfficesUseCase,
     AdminFindOfficeUseCase,
     AdminCreateOfficeUseCase,
@@ -33,6 +35,7 @@ import { OperatorUpdateOfficeUseCase } from './usecases/operator/operator-update
     OperatorUpdateOfficeUseCase,
     OperatorDeleteOfficeUseCase,
   ],
-  exports: [OfficeRepository],
+  // Vehicles (company staff) check that the chosen office belongs to their company.
+  exports: [OperatorOfficeRepository],
 })
 export class OfficesModule {}

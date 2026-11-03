@@ -6,12 +6,12 @@ import {
   normalizePhones,
   toOperatorOffice,
 } from '../../mappers/operator/operator-office.mapper.js';
-import { OfficeRepository } from '../../repository/office.repository.js';
+import { OperatorOfficeRepository } from '../../repository/operator/operator-office.repository.js';
 
 @Injectable()
 export class OperatorCreateOfficeUseCase {
   constructor(
-    private readonly offices: OfficeRepository,
+    private readonly offices: OperatorOfficeRepository,
     private readonly companies: CompanyRepository,
   ) {}
 

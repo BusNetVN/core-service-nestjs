@@ -1,17 +1,24 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Req,
+} from '@nestjs/common';
 import type { Request } from 'express';
 import { CurrentUser } from '../../../common/decorators/current-user.decorator.js';
 import { Public } from '../../../common/decorators/public.decorator.js';
 import type { AccessTokenPayload } from '../../../common/types/access-token-payload.js';
-import { ChangePasswordDto } from '../dto/change-password.dto.js';
-import { OperatorLoginDto } from '../dto/operator-login.dto.js';
-import { RefreshTokenDto } from '../dto/refresh-token.dto.js';
-import { ChangePasswordUseCase } from '../usecases/change-password.usecase.js';
-import { LogoutUseCase } from '../usecases/logout.usecase.js';
-import { OperatorLoginUseCase } from '../usecases/operator-login.usecase.js';
-import { OperatorRefreshTokenUseCase } from '../usecases/operator-refresh-token.usecase.js';
-import { logRequestBody } from '../utils/log-request-body.js';
-import { clientInfo } from '../utils/session-token.js';
+import { OperatorChangePasswordDto } from '../dto/operator/operator-change-password.dto.js';
+import { OperatorLoginDto } from '../dto/operator/operator-login.dto.js';
+import { OperatorRefreshTokenDto } from '../dto/operator/operator-refresh-token.dto.js';
+import { OperatorChangePasswordUseCase } from '../usecases/operator/operator-change-password.usecase.js';
+import { OperatorLogoutUseCase } from '../usecases/operator/operator-logout.usecase.js';
+import { OperatorLoginUseCase } from '../usecases/operator/operator-login.usecase.js';
+import { OperatorRefreshTokenUseCase } from '../usecases/operator/operator-refresh-token.usecase.js';
+import { logRequestBody } from '../utils/operator/operator-log-request-body.js';
+import { clientInfo } from '../utils/operator/operator-session-token.js';
 
 /**
  * Đăng nhập cho hệ thống vận hành nhà xe (bnv-operator), prefix: /api/operator/auth.
@@ -29,8 +36,8 @@ export class OperatorAuthController {
   constructor(
     private readonly operatorLogin: OperatorLoginUseCase,
     private readonly refreshToken: OperatorRefreshTokenUseCase,
-    private readonly logoutSession: LogoutUseCase,
-    private readonly changePasswordUseCase: ChangePasswordUseCase,
+    private readonly logoutSession: OperatorLogoutUseCase,
+    private readonly changePasswordUseCase: OperatorChangePasswordUseCase,
   ) {}
 
   /**
@@ -56,7 +63,7 @@ export class OperatorAuthController {
   @Post('refresh')
   @Public()
   @HttpCode(HttpStatus.OK)
-  refresh(@Body() dto: RefreshTokenDto) {
+  refresh(@Body() dto: OperatorRefreshTokenDto) {
     logRequestBody('POST /api/operator/auth/refresh', dto);
     return this.refreshToken.execute(dto);
   }
@@ -68,7 +75,7 @@ export class OperatorAuthController {
   @Post('logout')
   @Public()
   @HttpCode(HttpStatus.NO_CONTENT)
-  async logout(@Body() dto: RefreshTokenDto) {
+  async logout(@Body() dto: OperatorRefreshTokenDto) {
     logRequestBody('POST /api/operator/auth/logout', dto);
     await this.logoutSession.execute(dto);
   }
@@ -83,7 +90,7 @@ export class OperatorAuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async changePassword(
     @CurrentUser() user: AccessTokenPayload,
-    @Body() dto: ChangePasswordDto,
+    @Body() dto: OperatorChangePasswordDto,
   ) {
     logRequestBody('POST /api/operator/auth/change-password', {
       username: user.username,

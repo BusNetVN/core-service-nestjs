@@ -1,10 +1,10 @@
 import { ForbiddenException } from '@nestjs/common';
 import { ErrorMessage } from '../../../../common/constants/error-message.constant.js';
-import { OfficeRepository } from '../../repository/office.repository.js';
+import { OperatorOfficeRepository } from '../../repository/operator/operator-office.repository.js';
 
 /** The office `uuid` when it belongs to `companyUuid`; 404 when missing, 403 for another company. */
 export async function findCompanyOffice(
-  offices: OfficeRepository,
+  offices: OperatorOfficeRepository,
   companyUuid: string,
   uuid: string,
 ) {

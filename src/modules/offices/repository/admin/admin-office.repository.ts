@@ -5,17 +5,15 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Not, Repository } from 'typeorm';
-import { Office } from '../entities/office.entity.js';
+import { Office } from '../../entities/office.entity.js';
+
 const SEARCH_COLUMNS = ['office_code', 'name', 'address', 'note'] as const;
-const ADMIN_COMPANY_SEARCH_COLUMNS = [
-  'name',
-  'short_name',
-  'company_code',
-] as const;
+const COMPANY_SEARCH_COLUMNS = ['name', 'short_name', 'company_code'] as const;
 const COMPANY_RELATION = { company: true } as const;
 
+/** Office data access for /api/admin/offices: not limited to one company. */
 @Injectable()
-export class OfficeRepository {
+export class AdminOfficeRepository {
   constructor(
     @InjectRepository(Office)
     private readonly offices: Repository<Office>,
@@ -48,27 +46,8 @@ export class OfficeRepository {
     return office;
   }
 
-  async findAll(companyId: string, query?: string) {
-    const keyword = query?.trim();
-    const qb = this.offices
-      .createQueryBuilder('office')
-      .innerJoinAndSelect('office.company', 'company')
-      .where('office.company_id = :companyId', { companyId });
-
-    if (keyword) {
-      const filters = SEARCH_COLUMNS.map(
-        (column) => `LOWER(office.${column}) LIKE :q`,
-      ).join(' OR ');
-      qb.andWhere(`(${filters} OR CAST(office.phones AS TEXT) ILIKE :q)`, {
-        q: `%${keyword.toLowerCase()}%`,
-      });
-    }
-
-    return qb.orderBy('office.created_at', 'DESC').getMany();
-  }
-
   /** Offices of every company (or of one when `companyId` is set); the keyword also matches the company. */
-  async findAllForAdmin(options: { companyId?: string; query?: string }) {
+  async findAll(options: { companyId?: string; query?: string }) {
     const keyword = options.query?.trim();
     const qb = this.offices
       .createQueryBuilder('office')
@@ -83,7 +62,7 @@ export class OfficeRepository {
     if (keyword) {
       const filters = [
         ...SEARCH_COLUMNS.map((column) => `LOWER(office.${column}) LIKE :q`),
-        ...ADMIN_COMPANY_SEARCH_COLUMNS.map(
+        ...COMPANY_SEARCH_COLUMNS.map(
           (column) => `LOWER(company.${column}) LIKE :q`,
         ),
         'CAST(office.phones AS TEXT) ILIKE :q',
@@ -97,6 +76,7 @@ export class OfficeRepository {
       .getMany();
   }
 
+  /** Office codes are unique per company, compared case-insensitively. */
   async assertUnique(
     companyId: string,
     officeCode: string,

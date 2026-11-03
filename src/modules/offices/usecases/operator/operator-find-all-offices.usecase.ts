@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { CompanyRepository } from '../../../companies/repository/company.repository.js';
 import { toOperatorOffice } from '../../mappers/operator/operator-office.mapper.js';
-import { OfficeRepository } from '../../repository/office.repository.js';
+import { OperatorOfficeRepository } from '../../repository/operator/operator-office.repository.js';
 
 @Injectable()
 export class OperatorFindAllOfficesUseCase {
   constructor(
-    private readonly offices: OfficeRepository,
+    private readonly offices: OperatorOfficeRepository,
     private readonly companies: CompanyRepository,
   ) {}
 

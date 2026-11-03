@@ -1,16 +1,16 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CompanyRepository } from '../../../companies/repository/company.repository.js';
 import { toAdminOffice } from '../../mappers/admin/admin-office.mapper.js';
-import { OfficeRepository } from '../../repository/office.repository.js';
+import { AdminOfficeRepository } from '../../repository/admin/admin-office.repository.js';
 
 const UUID_V4 =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-/** Unlike OperatorFindAllOfficesUseCase, the company is optional: without it, offices of every company are listed. */
+/** The company is optional: without it, offices of every company are listed. */
 @Injectable()
 export class AdminFindAllOfficesUseCase {
   constructor(
-    private readonly offices: OfficeRepository,
+    private readonly offices: AdminOfficeRepository,
     private readonly companies: CompanyRepository,
   ) {}
 
@@ -23,7 +23,7 @@ export class AdminFindAllOfficesUseCase {
       companyId = (await this.companies.findByUuid(options.companyUuid)).id;
     }
 
-    const offices = await this.offices.findAllForAdmin({
+    const offices = await this.offices.findAll({
       companyId,
       query: options.query,
     });

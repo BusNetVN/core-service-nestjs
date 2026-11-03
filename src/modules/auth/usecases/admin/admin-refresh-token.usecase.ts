@@ -1,41 +1,28 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { ErrorMessage } from '../../../common/constants/error-message.constant.js';
+import { ErrorMessage } from '../../../../common/constants/error-message.constant.js';
+import { TokenService } from '../../../../common/services/token.service.js';
+import { AdminRefreshTokenDto } from '../../dto/admin/admin-refresh-token.dto.js';
+import { SessionRevokeReason } from '../../enums/session-revoke-reason.enum.js';
 import {
-  TokenService,
-  type TokenSubject,
-} from '../../../common/services/token.service.js';
-import type { User } from '../../users/entities/user.entity.js';
-import { RefreshTokenDto } from '../dto/refresh-token.dto.js';
-import { SessionRevokeReason } from '../enums/session-revoke-reason.enum.js';
-import { toLoginResponse, toTokenSubject } from '../mappers/auth.mapper.js';
-import { AuthSessionRepository } from '../repository/auth-session.repository.js';
-import { hashRefreshToken, sameHash } from '../utils/session-token.js';
-import { assertAdminAccount } from './assert-admin-account.js';
+  toAdminLoginResponse,
+  toAdminTokenSubject,
+} from '../../mappers/admin/admin-auth.mapper.js';
+import { AdminAuthSessionRepository } from '../../repository/admin/admin-auth-session.repository.js';
+import {
+  hashRefreshToken,
+  sameHash,
+} from '../../utils/admin/admin-session-token.js';
+import { assertAdminAccount } from './admin-assert-account.js';
 
+/** Exchanges a refresh token for new tokens of the same session; each refresh token works once. */
 @Injectable()
-export class RefreshTokenUseCase {
+export class AdminRefreshTokenUseCase {
   constructor(
-    private readonly sessions: AuthSessionRepository,
+    private readonly sessions: AdminAuthSessionRepository,
     private readonly tokens: TokenService,
   ) {}
 
-  /** Refresh for bnv-admin. */
-  async execute(dto: RefreshTokenDto) {
-    const { user, tokens } = await this.rotate(dto, assertAdminAccount, (account) =>
-      toTokenSubject(account),
-    );
-    return toLoginResponse(user, tokens);
-  }
-
-  /**
-   * Exchanges a refresh token for new tokens of the same session. `assertAccount` throws when
-   * the account may not use the calling app any more; the session is then revoked.
-   */
-  async rotate(
-    dto: RefreshTokenDto,
-    assertAccount: (user: User) => void,
-    subjectFor: (user: User) => TokenSubject | Promise<TokenSubject>,
-  ) {
+  async execute(dto: AdminRefreshTokenDto) {
     const payload = await this.tokens.verifyRefresh(dto.refresh_token);
     const session = await this.sessions.findByUuid(payload.sid);
     if (
@@ -60,13 +47,16 @@ export class RefreshTokenUseCase {
       throw new UnauthorizedException(ErrorMessage.INVALID_REFRESH_TOKEN);
     }
     try {
-      assertAccount(user);
+      assertAdminAccount(user);
     } catch (error) {
       await this.sessions.revoke(session, SessionRevokeReason.USER_INACTIVE);
       throw error;
     }
 
-    const tokens = await this.tokens.issue(await subjectFor(user), session.uuid);
+    const tokens = await this.tokens.issue(
+      toAdminTokenSubject(user),
+      session.uuid,
+    );
     const rotated = await this.sessions.rotate(
       session,
       presentedHash,
@@ -77,6 +67,6 @@ export class RefreshTokenUseCase {
       await this.sessions.revoke(session, SessionRevokeReason.TOKEN_REUSED);
       throw new UnauthorizedException(ErrorMessage.INVALID_REFRESH_TOKEN);
     }
-    return { user, tokens };
+    return toAdminLoginResponse(user, tokens);
   }
 }

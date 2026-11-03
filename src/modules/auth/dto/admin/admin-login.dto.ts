@@ -1,5 +1,6 @@
 import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
+/** Body of POST /api/admin/auth/login. */
 export class AdminLoginDto {
   @IsString()
   @IsNotEmpty({ message: 'Vui lòng nhập tên đăng nhập.' })

@@ -1,7 +1,7 @@
 import { ForbiddenException } from '@nestjs/common';
-import { AccountType } from '../../../common/constants/account.constant.js';
-import { ErrorMessage } from '../../../common/constants/error-message.constant.js';
-import { User } from '../../users/entities/user.entity.js';
+import { AccountType } from '../../../../common/constants/account.constant.js';
+import { ErrorMessage } from '../../../../common/constants/error-message.constant.js';
+import { User } from '../../../users/entities/user.entity.js';
 
 /** bnv-operator is only for staff of an active company; `user.company` must be loaded. */
 export function assertOperatorAccount(user: User) {

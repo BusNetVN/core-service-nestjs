@@ -6,13 +6,13 @@ import {
   normalizePhones,
   toOperatorOffice,
 } from '../../mappers/operator/operator-office.mapper.js';
-import { OfficeRepository } from '../../repository/office.repository.js';
-import { findCompanyOffice } from './find-company-office.js';
+import { OperatorOfficeRepository } from '../../repository/operator/operator-office.repository.js';
+import { findCompanyOffice } from './operator-find-company-office.js';
 
 /** Partial update of an office of `companyUuid`; the company itself cannot change. */
 @Injectable()
 export class OperatorUpdateOfficeUseCase {
-  constructor(private readonly offices: OfficeRepository) {}
+  constructor(private readonly offices: OperatorOfficeRepository) {}
 
   async execute(
     companyUuid: string,

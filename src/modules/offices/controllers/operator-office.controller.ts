@@ -46,7 +46,10 @@ export class OperatorOfficeController {
   @Get()
   @RequirePermission(ApiPermission.OFFICE_LIST)
   findAll(@CurrentUser() user: AccessTokenPayload, @Query('q') query?: string) {
-    return this.findAllOffices.execute(requiredCompanyUuidFromToken(user), query);
+    return this.findAllOffices.execute(
+      requiredCompanyUuidFromToken(user),
+      query,
+    );
   }
 
   /** GET /api/operator/offices/:id */

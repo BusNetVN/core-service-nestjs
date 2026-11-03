@@ -6,7 +6,7 @@ import {
   normalizePhones,
   toAdminOffice,
 } from '../../mappers/admin/admin-office.mapper.js';
-import { OfficeRepository } from '../../repository/office.repository.js';
+import { AdminOfficeRepository } from '../../repository/admin/admin-office.repository.js';
 
 /**
  * Partial update of any office. The company cannot be changed: vehicles of the
@@ -14,7 +14,7 @@ import { OfficeRepository } from '../../repository/office.repository.js';
  */
 @Injectable()
 export class AdminUpdateOfficeUseCase {
-  constructor(private readonly offices: OfficeRepository) {}
+  constructor(private readonly offices: AdminOfficeRepository) {}
 
   /** `actorUsername` is the username of the admin updating the office. */
   async execute(

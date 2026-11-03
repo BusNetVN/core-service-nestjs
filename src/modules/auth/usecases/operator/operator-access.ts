@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import type { Role } from '../../roles/entities/role.entity.js';
-import type { User } from '../../users/entities/user.entity.js';
-import { UserRoleRepository } from '../../users/repository/user-role.repository.js';
+import type { Role } from '../../../roles/entities/role.entity.js';
+import type { User } from '../../../users/entities/user.entity.js';
+import { UserRoleRepository } from '../../../users/repository/user-role.repository.js';
 
 export type OperatorAccess = {
   roles: Role[];

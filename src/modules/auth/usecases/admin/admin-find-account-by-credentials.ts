@@ -1,10 +1,10 @@
 import { UnauthorizedException } from '@nestjs/common';
 import { compare } from 'bcryptjs';
-import { normalizeUsername } from '../../users/mappers/user.mapper.js';
-import { UserRepository } from '../../users/repository/user.repository.js';
+import { normalizeUsername } from '../../../users/mappers/user.mapper.js';
+import { UserRepository } from '../../../users/repository/user.repository.js';
 
 /** The same message for an unknown username and a wrong password, so accounts cannot be probed. */
-export async function findAccountByCredentials(
+export async function findAdminAccountByCredentials(
   users: UserRepository,
   username: string,
   password: string,

@@ -1,6 +1,7 @@
 import { IsNotEmpty, IsString, Length, MaxLength } from 'class-validator';
 
-export class ChangePasswordDto {
+/** Body of POST /api/operator/auth/change-password. */
+export class OperatorChangePasswordDto {
   @IsString()
   @IsNotEmpty({ message: 'Vui lòng nhập mật khẩu hiện tại.' })
   @MaxLength(72, { message: 'Mật khẩu tối đa 72 ký tự.' })

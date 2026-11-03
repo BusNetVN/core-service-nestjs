@@ -6,13 +6,13 @@ import {
   normalizePhones,
   toAdminOffice,
 } from '../../mappers/admin/admin-office.mapper.js';
-import { OfficeRepository } from '../../repository/office.repository.js';
+import { AdminOfficeRepository } from '../../repository/admin/admin-office.repository.js';
 
 /** Creates an office for any company named by `company_uuid` (no company-scope restriction). */
 @Injectable()
 export class AdminCreateOfficeUseCase {
   constructor(
-    private readonly offices: OfficeRepository,
+    private readonly offices: AdminOfficeRepository,
     private readonly companies: CompanyRepository,
   ) {}
 
