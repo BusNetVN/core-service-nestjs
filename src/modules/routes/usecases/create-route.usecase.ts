@@ -15,7 +15,8 @@ export class CreateRouteUseCase {
     private readonly companies: CompanyRepository,
   ) {}
 
-  async execute(dto: CreateRouteDto) {
+  /** `actorUsername` is the username of the user creating the route. */
+  async execute(dto: CreateRouteDto, actorUsername: string) {
     const company = await this.companies.findByUuid(dto.company_uuid);
     const routeCode = normalizeRouteCode(dto.route_code);
     await this.routes.assertUnique(company.id, routeCode);
@@ -34,6 +35,8 @@ export class CreateRouteUseCase {
       note: dto.note?.trim() ?? '',
       status: dto.status ?? true,
       sort_order: await this.routes.nextSortOrder(company.id),
+      created_by: actorUsername || null,
+      updated_by: actorUsername || null,
     });
     const saved = await this.routes.save(route);
     saved.company = company;

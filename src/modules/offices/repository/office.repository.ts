@@ -6,9 +6,12 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Not, Repository } from 'typeorm';
 import { Office } from '../entities/office.entity.js';
-import { normalizeOfficeCode } from '../mappers/office.mapper.js';
-
 const SEARCH_COLUMNS = ['office_code', 'name', 'address', 'note'] as const;
+const ADMIN_COMPANY_SEARCH_COLUMNS = [
+  'name',
+  'short_name',
+  'company_code',
+] as const;
 const COMPANY_RELATION = { company: true } as const;
 
 @Injectable()
@@ -64,12 +67,42 @@ export class OfficeRepository {
     return qb.orderBy('office.created_at', 'DESC').getMany();
   }
 
+  /** Offices of every company (or of one when `companyId` is set); the keyword also matches the company. */
+  async findAllForAdmin(options: { companyId?: string; query?: string }) {
+    const keyword = options.query?.trim();
+    const qb = this.offices
+      .createQueryBuilder('office')
+      .innerJoinAndSelect('office.company', 'company');
+
+    if (options.companyId) {
+      qb.where('office.company_id = :companyId', {
+        companyId: options.companyId,
+      });
+    }
+
+    if (keyword) {
+      const filters = [
+        ...SEARCH_COLUMNS.map((column) => `LOWER(office.${column}) LIKE :q`),
+        ...ADMIN_COMPANY_SEARCH_COLUMNS.map(
+          (column) => `LOWER(company.${column}) LIKE :q`,
+        ),
+        'CAST(office.phones AS TEXT) ILIKE :q',
+      ].join(' OR ');
+      qb.andWhere(`(${filters})`, { q: `%${keyword.toLowerCase()}%` });
+    }
+
+    return qb
+      .orderBy('company.name', 'ASC')
+      .addOrderBy('office.created_at', 'DESC')
+      .getMany();
+  }
+
   async assertUnique(
     companyId: string,
     officeCode: string,
     excludeId?: string,
   ) {
-    const code = normalizeOfficeCode(officeCode);
+    const code = officeCode.trim().toUpperCase();
     const existed = await this.offices.findOne({
       where: excludeId
         ? {

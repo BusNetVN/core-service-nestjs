@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AdminCompaniesController } from './controllers/admin-companies.controller.js';
 import { CompaniesController } from './controllers/companies.controller.js';
 import { Company } from './entities/company.entity.js';
 import { CompanyRepository } from './repository/company.repository.js';
@@ -11,7 +12,7 @@ import { UpdateCompanyUseCase } from './usecases/update-company.usecase.js';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Company])],
-  controllers: [CompaniesController],
+  controllers: [CompaniesController, AdminCompaniesController],
   providers: [
     CompanyRepository,
     FindAllCompaniesUseCase,

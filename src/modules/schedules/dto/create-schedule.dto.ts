@@ -6,9 +6,13 @@ import {
   IsOptional,
   IsString,
   IsUUID,
+  Matches,
   MaxLength,
 } from 'class-validator';
 import { WeekdayMode } from '../enums/weekday-mode.enum.js';
+
+export const DEPARTURE_TIME_PATTERN =
+  /^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/;
 
 function trim({ value }: { value: unknown }) {
   return typeof value === 'string' ? value.trim() : value;
@@ -31,6 +35,13 @@ export class CreateScheduleDto {
   @Transform(trim)
   @IsString()
   end_date: string;
+
+  @Transform(trim)
+  @IsString()
+  @Matches(DEPARTURE_TIME_PATTERN, {
+    message: 'Giờ khởi hành không hợp lệ.',
+  })
+  departure_time: string;
 
   @IsOptional()
   @IsEnum(WeekdayMode)

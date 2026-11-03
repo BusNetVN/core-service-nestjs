@@ -18,17 +18,18 @@ export class LoggingInterceptor implements NestInterceptor {
     const response = http.getResponse<Response>();
     const startedAt = Date.now();
     const { method, originalUrl } = request;
+    const requestId = response.getHeader('X-Request-Id') ?? '-';
 
     return next.handle().pipe(
       tap({
         next: () => {
           this.logger.log(
-            `${method} ${originalUrl} ${response.statusCode} ${Date.now() - startedAt}ms`,
+            `${method} ${originalUrl} ${response.statusCode} ${Date.now() - startedAt}ms [${requestId}]`,
           );
         },
         error: (error: { status?: number }) => {
           this.logger.warn(
-            `${method} ${originalUrl} ${error?.status ?? 500} ${Date.now() - startedAt}ms`,
+            `${method} ${originalUrl} ${error?.status ?? 500} ${Date.now() - startedAt}ms [${requestId}]`,
           );
         },
       }),

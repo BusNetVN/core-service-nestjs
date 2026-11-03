@@ -8,7 +8,9 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { CurrentUser } from '../../../common/decorators/current-user.decorator.js';
 import { RequirePermission } from '../../../common/decorators/require-permission.decorator.js';
+import type { AccessTokenPayload } from '../../../common/types/access-token-payload.js';
 import { UuidParamPipe } from '../../../common/pipes/uuid-param.pipe.js';
 import { ApiPermission } from '../../../common/constants/api-permissions.js';
 import { CreateCompanyDto } from '../dto/create-company.dto.js';
@@ -43,17 +45,21 @@ export class CompaniesController {
 
   @Post()
   @RequirePermission(ApiPermission.COMPANY_CREATE)
-  create(@Body() dto: CreateCompanyDto) {
-    return this.createCompany.execute(dto);
+  create(
+    @CurrentUser() user: AccessTokenPayload,
+    @Body() dto: CreateCompanyDto,
+  ) {
+    return this.createCompany.execute(dto, user.username);
   }
 
   @Patch(':id')
   @RequirePermission(ApiPermission.COMPANY_UPDATE)
   update(
+    @CurrentUser() user: AccessTokenPayload,
     @Param('id', UuidParamPipe) id: string,
     @Body() dto: UpdateCompanyDto,
   ) {
-    return this.updateCompany.execute(id, dto);
+    return this.updateCompany.execute(id, dto, user.username);
   }
 
   @Delete(':id')

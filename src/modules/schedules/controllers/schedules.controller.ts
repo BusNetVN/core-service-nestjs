@@ -22,6 +22,7 @@ import { CreateScheduleDto } from '../dto/create-schedule.dto.js';
 import { UpdateScheduleDto } from '../dto/update-schedule.dto.js';
 import { CreateScheduleUseCase } from '../usecases/create-schedule.usecase.js';
 import { FindAllSchedulesUseCase } from '../usecases/find-all-schedules.usecase.js';
+import { FindMatchingSchedulesUseCase } from '../usecases/find-matching-schedules.usecase.js';
 import { FindScheduleUseCase } from '../usecases/find-schedule.usecase.js';
 import { RemoveScheduleUseCase } from '../usecases/remove-schedule.usecase.js';
 import { UpdateScheduleUseCase } from '../usecases/update-schedule.usecase.js';
@@ -30,6 +31,7 @@ import { UpdateScheduleUseCase } from '../usecases/update-schedule.usecase.js';
 export class SchedulesController {
   constructor(
     private readonly findAllSchedules: FindAllSchedulesUseCase,
+    private readonly findMatchingSchedules: FindMatchingSchedulesUseCase,
     private readonly findSchedule: FindScheduleUseCase,
     private readonly createSchedule: CreateScheduleUseCase,
     private readonly updateSchedule: UpdateScheduleUseCase,
@@ -41,12 +43,20 @@ export class SchedulesController {
   findAll(
     @CurrentUser() user: AccessTokenPayload,
     @Query('company_uuid') companyUuid?: string,
+    @Query('route_uuid') routeUuid?: string,
+    @Query('date') date?: string,
     @Query('q') query?: string,
   ) {
-    return this.findAllSchedules.execute(
-      companyUuidFromToken(user, companyUuid),
-      query,
-    );
+    const scopedCompanyUuid = companyUuidFromToken(user, companyUuid);
+    if (routeUuid || date) {
+      return this.findMatchingSchedules.execute(
+        scopedCompanyUuid,
+        routeUuid,
+        date,
+      );
+    }
+
+    return this.findAllSchedules.execute(scopedCompanyUuid, query);
   }
 
   @Get(':id')

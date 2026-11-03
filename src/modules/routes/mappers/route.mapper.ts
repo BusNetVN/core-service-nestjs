@@ -17,6 +17,8 @@ export type PublicRoute = {
   note: string;
   status: boolean;
   sort_order: number;
+  created_by: string | null;
+  updated_by: string | null;
   created_at: Date;
   updated_at: Date;
 };
@@ -43,6 +45,8 @@ export function toPublicRoute(route: Route): PublicRoute {
     note: route.note,
     status: route.status,
     sort_order: route.sort_order,
+    created_by: route.created_by,
+    updated_by: route.updated_by,
     created_at: route.created_at,
     updated_at: route.updated_at,
   };

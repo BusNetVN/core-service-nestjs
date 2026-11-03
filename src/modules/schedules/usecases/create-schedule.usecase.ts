@@ -4,6 +4,7 @@ import { RouteRepository } from '../../routes/repository/route.repository.js';
 import { SeatMapRepository } from '../../seat-maps/repository/seat-map.repository.js';
 import { CreateScheduleDto } from '../dto/create-schedule.dto.js';
 import {
+  normalizeDepartureTime,
   normalizeWeekdayMode,
   normalizeWeekdays,
   orderedDates,
@@ -43,6 +44,7 @@ export class CreateScheduleUseCase {
       seat_map: seatMap,
       start_date: dates.start_date,
       end_date: dates.end_date,
+      departure_time: normalizeDepartureTime(dto.departure_time),
       weekday_mode: weekdayMode,
       weekdays: normalizeWeekdays(weekdayMode, dto.weekdays),
       note: dto.note?.trim() ?? '',

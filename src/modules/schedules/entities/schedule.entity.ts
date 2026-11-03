@@ -66,6 +66,9 @@ export class Schedule {
   @Column({ type: 'date' })
   end_date: string;
 
+  @Column({ type: 'time', default: '00:00:00' })
+  departure_time: string;
+
   @Column({
     type: 'varchar',
     length: 16,

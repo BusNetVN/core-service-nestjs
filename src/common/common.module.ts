@@ -5,6 +5,7 @@ import { HttpExceptionFilter } from './filters/http-exception.filter.js';
 import { AccessTokenGuard } from './guards/access-token.guard.js';
 import { PermissionsGuard } from './guards/permissions.guard.js';
 import { LoggingInterceptor } from './interceptors/logging.interceptor.js';
+import { ResponseEnvelopeInterceptor } from './interceptors/response-envelope.interceptor.js';
 import { AppValidationPipe } from './pipes/validation.pipe.js';
 import { TokenService } from './services/token.service.js';
 
@@ -33,6 +34,10 @@ import { TokenService } from './services/token.service.js';
     {
       provide: APP_INTERCEPTOR,
       useClass: LoggingInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseEnvelopeInterceptor,
     },
   ],
   exports: [TokenService],

@@ -26,7 +26,9 @@ export function toPublicCompany(company: Company): PublicCompany {
     email: company.email,
     phone: company.phone,
     website: company.website,
-    status: company.status,
+    is_active: company.is_active,
+    created_by: company.created_by,
+    updated_by: company.updated_by,
     created_at: company.created_at,
     updated_at: company.updated_at,
   };

@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
 import { ApiPermission } from '../../../common/constants/api-permissions.js';
@@ -20,12 +21,15 @@ import {
 } from '../../../common/utils/company-scope.js';
 import { CreateRouteDto } from '../dto/create-route.dto.js';
 import { ReorderRoutesDto } from '../dto/reorder-routes.dto.js';
+import { ReplaceRoutePointsDto } from '../dto/replace-route-points.dto.js';
 import { UpdateRouteDto } from '../dto/update-route.dto.js';
 import { CreateRouteUseCase } from '../usecases/create-route.usecase.js';
 import { FindAllRoutesUseCase } from '../usecases/find-all-routes.usecase.js';
+import { FindRoutePointsUseCase } from '../usecases/find-route-points.usecase.js';
 import { FindRouteUseCase } from '../usecases/find-route.usecase.js';
 import { RemoveRouteUseCase } from '../usecases/remove-route.usecase.js';
 import { ReorderRoutesUseCase } from '../usecases/reorder-routes.usecase.js';
+import { ReplaceRoutePointsUseCase } from '../usecases/replace-route-points.usecase.js';
 import { UpdateRouteUseCase } from '../usecases/update-route.usecase.js';
 
 @Controller('routes')
@@ -37,6 +41,8 @@ export class RoutesController {
     private readonly updateRoute: UpdateRouteUseCase,
     private readonly reorderRoutes: ReorderRoutesUseCase,
     private readonly removeRoute: RemoveRouteUseCase,
+    private readonly findRoutePoints: FindRoutePointsUseCase,
+    private readonly replaceRoutePoints: ReplaceRoutePointsUseCase,
   ) {}
 
   @Get()
@@ -59,7 +65,30 @@ export class RoutesController {
     @Body() dto: ReorderRoutesDto,
   ) {
     dto.company_uuid = requiredCompanyUuidFromToken(user, dto.company_uuid);
-    return this.reorderRoutes.execute(dto);
+    return this.reorderRoutes.execute(dto, user.username);
+  }
+
+  @Get(':id/stops')
+  @RequirePermission(ApiPermission.ROUTE_LIST)
+  async findStops(
+    @CurrentUser() user: AccessTokenPayload,
+    @Param('id', UuidParamPipe) id: string,
+  ) {
+    const route = await this.findRoute.execute(id);
+    assertCompanyResource(user, route.company_uuid);
+    return this.findRoutePoints.execute(id);
+  }
+
+  @Put(':id/stops')
+  @RequirePermission(ApiPermission.ROUTE_UPDATE)
+  async replaceStops(
+    @CurrentUser() user: AccessTokenPayload,
+    @Param('id', UuidParamPipe) id: string,
+    @Body() dto: ReplaceRoutePointsDto,
+  ) {
+    const route = await this.findRoute.execute(id);
+    assertCompanyResource(user, route.company_uuid);
+    return this.replaceRoutePoints.execute(id, dto);
   }
 
   @Get(':id')
@@ -80,7 +109,7 @@ export class RoutesController {
     @Body() dto: CreateRouteDto,
   ) {
     dto.company_uuid = requiredCompanyUuidFromToken(user, dto.company_uuid);
-    return this.createRoute.execute(dto);
+    return this.createRoute.execute(dto, user.username);
   }
 
   @Patch(':id')
@@ -92,7 +121,7 @@ export class RoutesController {
   ) {
     const route = await this.findRoute.execute(id);
     assertCompanyResource(user, route.company_uuid);
-    return this.updateRoute.execute(id, dto);
+    return this.updateRoute.execute(id, dto, user.username);
   }
 
   @Delete(':id')

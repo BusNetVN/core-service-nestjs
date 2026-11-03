@@ -12,7 +12,8 @@ import { RouteRepository } from '../repository/route.repository.js';
 export class UpdateRouteUseCase {
   constructor(private readonly routes: RouteRepository) {}
 
-  async execute(uuid: string, dto: UpdateRouteDto) {
+  /** `actorUsername` is the username of the user updating the route. */
+  async execute(uuid: string, dto: UpdateRouteDto, actorUsername: string) {
     const route = await this.routes.findByUuid(uuid);
     if (dto.route_code) {
       await this.routes.assertUnique(
@@ -21,7 +22,10 @@ export class UpdateRouteUseCase {
         route.id,
       );
     }
-    this.routes.merge(route, this.definedFields(dto, route));
+    this.routes.merge(route, {
+      ...this.definedFields(dto, route),
+      updated_by: actorUsername || null,
+    });
     const saved = await this.routes.save(route);
     saved.company = route.company;
     return toPublicRoute(saved);

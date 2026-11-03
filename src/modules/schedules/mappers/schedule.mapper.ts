@@ -2,6 +2,10 @@ import { toPublicCompany, type PublicCompany } from '../../companies/mappers/com
 import { Route } from '../../routes/entities/route.entity.js';
 import { SeatMap } from '../../seat-maps/entities/seat-map.entity.js';
 import { SeatMapType } from '../../seat-maps/enums/seat-map-type.enum.js';
+import {
+  countSeats,
+  normalizeSeats,
+} from '../../seat-maps/mappers/seat-map.mapper.js';
 import { Schedule } from '../entities/schedule.entity.js';
 import { WeekdayMode } from '../enums/weekday-mode.enum.js';
 
@@ -18,6 +22,7 @@ export type PublicScheduleSeatMap = {
   seat_map_code: string;
   name: string;
   layout_type: SeatMapType;
+  seat_count: number;
 };
 
 export type PublicSchedule = {
@@ -30,6 +35,7 @@ export type PublicSchedule = {
   seat_map: PublicScheduleSeatMap;
   start_date: string;
   end_date: string;
+  departure_time: string;
   weekday_mode: WeekdayMode;
   weekdays: number[];
   note: string;
@@ -76,6 +82,40 @@ export function toDateOnly(value: unknown) {
   return '';
 }
 
+export function isoWeekday(date: string) {
+  const day = new Date(`${date}T00:00:00.000Z`).getUTCDay();
+  return day === 0 ? 7 : day;
+}
+
+export function isIsoDate(value: string) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(value);
+}
+
+export function toTimeOnly(value: unknown) {
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    const hours = String(value.getHours()).padStart(2, '0');
+    const minutes = String(value.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  }
+
+  if (typeof value === 'string' && value.trim()) {
+    const match = value.trim().match(/^(\d{2}):(\d{2})/);
+    if (match) {
+      return `${match[1]}:${match[2]}`;
+    }
+  }
+
+  return '';
+}
+
+export function normalizeDepartureTime(value: unknown) {
+  const time = toTimeOnly(value);
+  if (!time) {
+    return '00:00';
+  }
+  return time;
+}
+
 export function orderedDates(start: unknown, end: unknown) {
   const startDate = toDateOnly(start);
   const endDate = toDateOnly(end);
@@ -96,11 +136,18 @@ export function toPublicScheduleRoute(route: Route): PublicScheduleRoute {
 }
 
 export function toPublicScheduleSeatMap(seatMap: SeatMap): PublicScheduleSeatMap {
+  const seats = normalizeSeats(
+    seatMap.seats,
+    seatMap.floors,
+    seatMap.rows,
+    seatMap.columns,
+  );
   return {
     id: seatMap.uuid,
     seat_map_code: seatMap.seat_map_code,
     name: seatMap.name,
     layout_type: seatMap.layout_type,
+    seat_count: countSeats(seats),
   };
 }
 
@@ -116,6 +163,7 @@ export function toPublicSchedule(schedule: Schedule): PublicSchedule {
     seat_map: toPublicScheduleSeatMap(schedule.seat_map),
     start_date: toDateOnly(schedule.start_date),
     end_date: toDateOnly(schedule.end_date),
+    departure_time: normalizeDepartureTime(schedule.departure_time),
     weekday_mode: weekdayMode,
     weekdays: normalizeWeekdays(weekdayMode, schedule.weekdays),
     note: schedule.note,

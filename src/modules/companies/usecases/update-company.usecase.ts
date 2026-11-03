@@ -11,14 +11,18 @@ import { CompanyRepository } from '../repository/company.repository.js';
 export class UpdateCompanyUseCase {
   constructor(private readonly companies: CompanyRepository) {}
 
-  async execute(uuid: string, dto: UpdateCompanyDto) {
+  /** `actorUsername` is the username of the user updating the company. */
+  async execute(uuid: string, dto: UpdateCompanyDto, actorUsername: string) {
     const company = await this.companies.findByUuid(uuid);
     await this.companies.assertUnique(
       dto.company_code ? normalizeCompanyCode(dto.company_code) : undefined,
       dto.slug,
       company.id,
     );
-    this.companies.merge(company, this.definedFields(dto));
+    this.companies.merge(company, {
+      ...this.definedFields(dto),
+      updated_by: actorUsername || null,
+    });
     return toPublicCompany(await this.companies.save(company));
   }
 

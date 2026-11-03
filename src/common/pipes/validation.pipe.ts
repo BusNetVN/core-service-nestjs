@@ -16,9 +16,10 @@ export class AppValidationPipe extends ValidationPipe {
       transformOptions: { enableImplicitConversion: true },
       exceptionFactory: (errors: ValidationError[]) => {
         const messages = flattenValidationErrors(errors);
-        return new BadRequestException(
-          messages.length > 0 ? messages : ErrorMessage.VALIDATION_FAILED,
-        );
+        return new BadRequestException({
+          code: 'VALIDATION_FAILED',
+          message: messages.length > 0 ? messages : ErrorMessage.VALIDATION_FAILED,
+        });
       },
     });
   }

@@ -10,7 +10,8 @@ import { CompanyRepository } from '../repository/company.repository.js';
 export class CreateCompanyUseCase {
   constructor(private readonly companies: CompanyRepository) {}
 
-  async execute(dto: CreateCompanyDto) {
+  /** `actorUsername` is the username of the user creating the company. */
+  async execute(dto: CreateCompanyDto, actorUsername: string) {
     const companyCode = normalizeCompanyCode(dto.company_code);
     await this.companies.assertUnique(companyCode, dto.slug);
     const company = this.companies.create({
@@ -30,7 +31,9 @@ export class CreateCompanyUseCase {
       email: dto.email ?? '',
       phone: dto.phone ?? '',
       website: dto.website ?? '',
-      status: dto.status ?? true,
+      is_active: dto.is_active ?? true,
+      created_by: actorUsername || null,
+      updated_by: actorUsername || null,
     });
     return toPublicCompany(await this.companies.save(company));
   }

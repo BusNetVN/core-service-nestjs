@@ -5,6 +5,8 @@ import { FindCompanyUseCase } from './find-company.usecase.js';
 import { BusinessType } from '../enums/business-type.enum.js';
 import { CompanyRepository } from '../repository/company.repository.js';
 
+const ACTOR_USERNAME = 'admin';
+
 describe('Company usecases', () => {
   const companies = {
     assertUnique: vi.fn(),
@@ -39,15 +41,20 @@ describe('Company usecases', () => {
   it('creates a company when code and slug are unique', async () => {
     companies.assertUnique.mockResolvedValue(undefined);
 
-    const created = await createCompany.execute({
-      name: 'Nhà xe Kim Liên',
-      company_code: 'KLIEN',
-      slug: 'kim-lien',
-      business_type: BusinessType.Llc,
-    });
+    const created = await createCompany.execute(
+      {
+        name: 'Nhà xe Kim Liên',
+        company_code: 'KLIEN',
+        slug: 'kim-lien',
+        business_type: BusinessType.Llc,
+      },
+      ACTOR_USERNAME,
+    );
 
     expect(created.company_code).toBe('klien');
-    expect(created.status).toBe(true);
+    expect(created.is_active).toBe(true);
+    expect(created.created_by).toBe(ACTOR_USERNAME);
+    expect(created.updated_by).toBe(ACTOR_USERNAME);
     expect(created.id).toMatch(
       /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
     );
@@ -58,12 +65,15 @@ describe('Company usecases', () => {
     companies.assertUnique.mockRejectedValue(new ConflictException());
 
     await expect(
-      createCompany.execute({
-        name: 'Nhà xe khác',
-        company_code: 'futa',
-        slug: 'nha-xe-khac',
-        business_type: BusinessType.Llc,
-      }),
+      createCompany.execute(
+        {
+          name: 'Nhà xe khác',
+          company_code: 'futa',
+          slug: 'nha-xe-khac',
+          business_type: BusinessType.Llc,
+        },
+        ACTOR_USERNAME,
+      ),
     ).rejects.toBeInstanceOf(ConflictException);
   });
 

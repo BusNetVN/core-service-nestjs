@@ -72,4 +72,22 @@ export class ScheduleRepository {
       .addOrderBy('schedule.created_at', 'DESC')
       .getMany();
   }
+
+  findMatching(companyId: string, routeUuid: string, date: string, weekday: number) {
+    return this.schedules
+      .createQueryBuilder('schedule')
+      .innerJoinAndSelect('schedule.company', 'company')
+      .innerJoinAndSelect('schedule.route', 'route')
+      .innerJoinAndSelect('schedule.seat_map', 'seat_map')
+      .where('schedule.company_id = :companyId', { companyId })
+      .andWhere('route.uuid = :routeUuid', { routeUuid })
+      .andWhere('schedule.status = true')
+      .andWhere('schedule.start_date <= :date', { date })
+      .andWhere('schedule.end_date >= :date', { date })
+      .andWhere(':weekday = ANY(schedule.weekdays)', { weekday })
+      .orderBy('schedule.departure_time', 'ASC')
+      .addOrderBy('schedule.start_date', 'ASC')
+      .addOrderBy('schedule.created_at', 'ASC')
+      .getMany();
+  }
 }

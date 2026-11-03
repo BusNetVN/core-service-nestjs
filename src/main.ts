@@ -7,10 +7,13 @@ import {
   API_GLOBAL_PREFIX_EXCLUDE,
   CORS_ALLOWED_HEADERS,
 } from './common/constants/http.constant.js';
+import { requestContext } from './common/http/api-response.js';
+import { gatewayOnly } from './common/middleware/gateway-only.middleware.js';
 
 type AppConfig = {
   port: number;
   corsOrigins: string[];
+  gatewayToken: string;
 };
 
 async function pingDatabase(dataSource: DataSource) {
@@ -72,6 +75,8 @@ async function bootstrap() {
     await logDatabaseConnection(app.get(DataSource));
 
     app.setGlobalPrefix(API_GLOBAL_PREFIX, { exclude: API_GLOBAL_PREFIX_EXCLUDE });
+    app.use(requestContext());
+    app.use(gatewayOnly(appConfig.gatewayToken));
     app.enableCors({
       origin: appConfig.corsOrigins,
       allowedHeaders: [...CORS_ALLOWED_HEADERS],

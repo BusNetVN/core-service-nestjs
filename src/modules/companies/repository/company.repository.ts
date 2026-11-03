@@ -5,7 +5,7 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Not, Repository } from 'typeorm';
+import { ILike, In, Not, Repository } from 'typeorm';
 import { Company } from '../entities/company.entity.js';
 import { normalizeCompanyCode } from '../mappers/company.mapper.js';
 
@@ -48,12 +48,34 @@ export class CompanyRepository implements OnModuleInit {
     return this.companies.remove(company);
   }
 
+  async findByUuids(uuids: string[]) {
+    const unique = [...new Set(uuids)];
+    if (unique.length === 0) {
+      return [];
+    }
+    return this.companies.find({ where: { uuid: In(unique) } });
+  }
+
   async findByUuid(uuid: string) {
     const company = await this.companies.findOne({ where: { uuid } });
     if (!company) {
       throw new NotFoundException('Không tìm thấy nhà xe.');
     }
     return company;
+  }
+
+  findOptionalByUuid(uuid: string) {
+    return this.companies.findOne({ where: { uuid } });
+  }
+
+  async hasActiveUsers(companyId: string) {
+    const [row] = (await this.companies.query(
+      `SELECT EXISTS (
+        SELECT 1 FROM tbl_users WHERE company_id = $1 AND deleted_at IS NULL
+      ) AS used`,
+      [companyId],
+    )) as Array<{ used: boolean }>;
+    return row?.used === true;
   }
 
   async findAll(query?: string) {

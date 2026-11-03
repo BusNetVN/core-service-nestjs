@@ -7,31 +7,36 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
-import { AccountType, StaffRole } from '../constants/account.constant.js';
-import { COMPANY_ADMIN_PERMISSIONS, COMPANY_STAFF_PERMISSIONS } from '../constants/api-permissions.js';
+import { AccountType } from '../constants/account.constant.js';
 import { ErrorMessage } from '../constants/error-message.constant.js';
-import { IS_PUBLIC_KEY, REQUIRED_PERMISSIONS_KEY } from '../constants/metadata.constant.js';
+import {
+  IS_PUBLIC_KEY,
+  REQUIRED_PERMISSIONS_KEY,
+  SYSTEM_ADMIN_ONLY_KEY,
+} from '../constants/metadata.constant.js';
 import type { AccessTokenPayload } from '../types/access-token-payload.js';
-import { normalizePermissionCode } from '../utils/permission-code.js';
+import { grantedPermissionCodes } from '../utils/permission-code.js';
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext) {
-    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    const targets = [context.getHandler(), context.getClass()];
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, targets);
     if (isPublic) {
       return true;
     }
 
+    const systemAdminOnly = this.reflector.getAllAndOverride<boolean>(
+      SYSTEM_ADMIN_ONLY_KEY,
+      targets,
+    );
     const required = this.reflector.getAllAndOverride<string[]>(
       REQUIRED_PERMISSIONS_KEY,
-      [context.getHandler(), context.getClass()],
+      targets,
     );
-    if (!required?.length) {
+    if (!systemAdminOnly && !required?.length) {
       return true;
     }
 
@@ -47,32 +52,20 @@ export class PermissionsGuard implements CanActivate {
       return true;
     }
 
-    const granted = this.resolveGrantedCodes(user);
+    if (systemAdminOnly) {
+      throw new ForbiddenException(ErrorMessage.SYSTEM_ADMIN_ONLY);
+    }
+
+    const granted = grantedPermissionCodes({
+      account_type: user.account_type,
+      staff_role: user.staff_role,
+      permissions: user.permissions ?? [],
+    });
     const allowed = required.some((code) => granted.has(code));
     if (!allowed) {
       throw new ForbiddenException(ErrorMessage.FORBIDDEN_PERMISSION);
     }
 
     return true;
-  }
-
-  private resolveGrantedCodes(user: AccessTokenPayload) {
-    const granted = new Set(
-      (user.permissions ?? [])
-        .map((code) => normalizePermissionCode(code))
-        .filter(Boolean),
-    );
-
-    if (user.account_type === AccountType.COMPANY_STAFF) {
-      const extras =
-        user.staff_role === StaffRole.ADMIN
-          ? COMPANY_ADMIN_PERMISSIONS
-          : COMPANY_STAFF_PERMISSIONS;
-      for (const code of extras) {
-        granted.add(code);
-      }
-    }
-
-    return granted;
   }
 }

@@ -4,6 +4,7 @@ import { SeatMapRepository } from '../../seat-maps/repository/seat-map.repositor
 import { UpdateScheduleDto } from '../dto/update-schedule.dto.js';
 import { Schedule } from '../entities/schedule.entity.js';
 import {
+  normalizeDepartureTime,
   normalizeWeekdayMode,
   normalizeWeekdays,
   orderedDates,
@@ -60,6 +61,10 @@ export class UpdateScheduleUseCase {
       );
       fields.start_date = dates.start_date;
       fields.end_date = dates.end_date;
+    }
+
+    if (dto.departure_time !== undefined) {
+      fields.departure_time = normalizeDepartureTime(dto.departure_time);
     }
 
     if (dto.weekday_mode !== undefined || dto.weekdays !== undefined) {

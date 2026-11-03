@@ -15,6 +15,7 @@ const SEARCH_COLUMNS = [
   'destination',
   'note',
 ] as const;
+const ADMIN_COMPANY_SEARCH_COLUMNS = ['name', 'short_name', 'company_code'] as const;
 const COMPANY_RELATION = { company: true } as const;
 
 @Injectable()
@@ -73,6 +74,36 @@ export class RouteRepository {
       .getMany();
   }
 
+  /** Routes of every company (or of one when `companyId` is set); the keyword also matches the company. */
+  async findAllForAdmin(options: { companyId?: string; query?: string }) {
+    const keyword = options.query?.trim();
+    const qb = this.routes
+      .createQueryBuilder('route')
+      .innerJoinAndSelect('route.company', 'company');
+
+    if (options.companyId) {
+      qb.where('route.company_id = :companyId', {
+        companyId: options.companyId,
+      });
+    }
+
+    if (keyword) {
+      const filters = [
+        ...SEARCH_COLUMNS.map((column) => `LOWER(route.${column}) LIKE :q`),
+        ...ADMIN_COMPANY_SEARCH_COLUMNS.map(
+          (column) => `LOWER(company.${column}) LIKE :q`,
+        ),
+      ].join(' OR ');
+      qb.andWhere(`(${filters})`, { q: `%${keyword.toLowerCase()}%` });
+    }
+
+    return qb
+      .orderBy('company.name', 'ASC')
+      .addOrderBy('route.sort_order', 'ASC')
+      .addOrderBy('route.created_at', 'DESC')
+      .getMany();
+  }
+
   async nextSortOrder(companyId: string) {
     const result = await this.routes
       .createQueryBuilder('route')
@@ -82,13 +113,29 @@ export class RouteRepository {
     return Number(result?.max ?? -1) + 1;
   }
 
-  async reorder(companyId: string, ids: string[]) {
+  /**
+   * Gives each route its index in `ids` as sort_order. Moving a route is an update of
+   * that record, so routes whose position changes get updated_by (and, through
+   * @UpdateDateColumn, updated_at); routes that keep their position are left untouched.
+   */
+  async reorder(companyId: string, ids: string[], actorUsername: string) {
     await this.routes.manager.transaction(async (manager) => {
+      const current = await manager.find(Route, {
+        select: { uuid: true, sort_order: true },
+        where: { company_id: companyId },
+      });
+      const sortOrderByUuid = new Map(
+        current.map((route) => [route.uuid, route.sort_order]),
+      );
+
       for (const [index, uuid] of ids.entries()) {
+        if (sortOrderByUuid.get(uuid) === index) {
+          continue;
+        }
         await manager.update(
           Route,
           { uuid, company_id: companyId },
-          { sort_order: index },
+          { sort_order: index, updated_by: actorUsername || null },
         );
       }
     });

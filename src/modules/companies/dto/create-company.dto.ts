@@ -21,6 +21,10 @@ function trimLower({ value }: { value: unknown }) {
   return typeof value === 'string' ? value.trim().toLowerCase() : value;
 }
 
+function trimUpper({ value }: { value: unknown }) {
+  return typeof value === 'string' ? value.trim().toUpperCase() : value;
+}
+
 export class CreateCompanyDto {
   @Transform(trim)
   @IsString()
@@ -66,6 +70,7 @@ export class CreateCompanyDto {
   @IsString()
   description?: string;
 
+  @Transform(trimUpper)
   @IsEnum(BusinessType, { message: 'Loại hình không hợp lệ.' })
   business_type: BusinessType;
 
@@ -116,5 +121,5 @@ export class CreateCompanyDto {
 
   @IsOptional()
   @IsBoolean()
-  status?: boolean;
+  is_active?: boolean;
 }
