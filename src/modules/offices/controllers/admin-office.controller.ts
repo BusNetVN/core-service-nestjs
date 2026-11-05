@@ -78,7 +78,7 @@ export class AdminOfficeController {
    * của tài khoản đang đăng nhập.
    *
    * Vào: body AdminCreateOfficeDto - bắt buộc company_uuid, office_code, name, address và
-   *      ít nhất một số điện thoại trong phones; note tùy chọn.
+   *      ít nhất một số điện thoại trong phones; note, is_active (mặc định true) tùy chọn.
    *      Mã văn phòng được đổi về chữ in hoa, số điện thoại bị trùng được loại bỏ.
    * Ra:  201 + AdminOffice vừa tạo.
    * Lỗi: 400 dữ liệu không hợp lệ; 404 không tìm thấy nhà xe;
@@ -99,7 +99,7 @@ export class AdminOfficeController {
    * Không đổi được nhà xe của văn phòng.
    *
    * Vào: `id` - uuid v4 của văn phòng; body AdminUpdateOfficeDto (office_code, name, address,
-   *      phones, note, đều tùy chọn; gửi company_uuid -> 400).
+   *      phones, note, is_active, đều tùy chọn; gửi company_uuid -> 400).
    * Ra:  AdminOffice sau khi cập nhật.
    * Lỗi: 400 dữ liệu không hợp lệ; 404 không tìm thấy;
    *      409 mã văn phòng đã tồn tại trong nhà xe.

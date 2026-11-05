@@ -59,6 +59,10 @@ export class Office {
   @Column({ type: 'text', default: '' })
   note: string;
 
+  /** false when the office has stopped working; it is kept for history and assigned vehicles. */
+  @Column({ type: 'boolean', default: true })
+  is_active: boolean;
+
   /**
    * Username of the account that created the office, as it was at that time
    * (not a foreign key, so it survives renames and deletions); null for older rows.

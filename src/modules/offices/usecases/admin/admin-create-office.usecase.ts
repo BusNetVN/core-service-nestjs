@@ -32,6 +32,7 @@ export class AdminCreateOfficeUseCase {
         address: dto.address,
         phones: normalizePhones(dto.phones),
         note: dto.note?.trim() ?? '',
+        is_active: dto.is_active ?? true,
         created_by: actorUsername || null,
         updated_by: actorUsername || null,
       }),

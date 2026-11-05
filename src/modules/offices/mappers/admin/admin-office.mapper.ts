@@ -30,6 +30,7 @@ export type AdminOffice = {
   address: string;
   phones: string[];
   note: string;
+  is_active: boolean;
   created_by: string | null;
   updated_by: string | null;
   created_at: Date;
@@ -46,6 +47,7 @@ export function toAdminOffice(office: Office): AdminOffice {
     address: office.address,
     phones: office.phones ?? [],
     note: office.note,
+    is_active: office.is_active,
     created_by: office.created_by,
     updated_by: office.updated_by,
     created_at: office.created_at,

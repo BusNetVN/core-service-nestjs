@@ -8,7 +8,6 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { ApiPermission } from '../../../common/constants/api-permissions.js';
 import { CurrentUser } from '../../../common/decorators/current-user.decorator.js';
 import { RequirePermission } from '../../../common/decorators/require-permission.decorator.js';
 import { UuidParamPipe } from '../../../common/pipes/uuid-param.pipe.js';
@@ -44,7 +43,7 @@ export class OperatorOfficeController {
    * Văn phòng của nhà xe, mới tạo trước. `q` tìm theo mã, tên, địa chỉ, ghi chú, số điện thoại.
    */
   @Get()
-  @RequirePermission(ApiPermission.OFFICE_LIST)
+  @RequirePermission('OFFICE_LIST')
   findAll(@CurrentUser() user: AccessTokenPayload, @Query('q') query?: string) {
     return this.findAllOffices.execute(
       requiredCompanyUuidFromToken(user),
@@ -54,7 +53,7 @@ export class OperatorOfficeController {
 
   /** GET /api/operator/offices/:id */
   @Get(':id')
-  @RequirePermission(ApiPermission.OFFICE_LIST)
+  @RequirePermission('OFFICE_LIST')
   findOne(
     @CurrentUser() user: AccessTokenPayload,
     @Param('id', UuidParamPipe) id: string,
@@ -64,11 +63,11 @@ export class OperatorOfficeController {
 
   /**
    * POST /api/operator/offices
-   * Vào: { office_code, name, address, phones (ít nhất 1), note? }.
+   * Vào: { office_code, name, address, phones (ít nhất 1), note?, is_active? (mặc định true) }.
    * Lỗi: 400 dữ liệu không hợp lệ; 409 mã văn phòng đã tồn tại trong nhà xe.
    */
   @Post()
-  @RequirePermission(ApiPermission.OFFICE_CREATE)
+  @RequirePermission('OFFICE_CREATE')
   create(
     @CurrentUser() user: AccessTokenPayload,
     @Body() dto: OperatorCreateOfficeDto,
@@ -82,7 +81,7 @@ export class OperatorOfficeController {
 
   /** PATCH /api/operator/offices/:id - cập nhật một phần; không đổi được nhà xe. */
   @Patch(':id')
-  @RequirePermission(ApiPermission.OFFICE_UPDATE)
+  @RequirePermission('OFFICE_UPDATE')
   update(
     @CurrentUser() user: AccessTokenPayload,
     @Param('id', UuidParamPipe) id: string,
@@ -98,7 +97,7 @@ export class OperatorOfficeController {
 
   /** DELETE /api/operator/offices/:id - xe đang gán văn phòng này được bỏ liên kết. */
   @Delete(':id')
-  @RequirePermission(ApiPermission.OFFICE_DELETE)
+  @RequirePermission('OFFICE_DELETE')
   remove(
     @CurrentUser() user: AccessTokenPayload,
     @Param('id', UuidParamPipe) id: string,

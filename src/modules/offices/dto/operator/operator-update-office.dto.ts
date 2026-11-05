@@ -2,6 +2,7 @@ import { Transform } from 'class-transformer';
 import {
   ArrayMinSize,
   IsArray,
+  IsBoolean,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -73,4 +74,7 @@ export class OperatorUpdateOfficeDto {
   @IsString()
   @MaxLength(1000)
   note?: string;
+  @IsOptional()
+  @IsBoolean({ message: 'Trạng thái không hợp lệ.' })
+  is_active?: boolean;
 }

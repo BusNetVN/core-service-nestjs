@@ -35,6 +35,7 @@ export class OperatorUpdateOfficeUseCase {
     if (dto.address !== undefined) fields.address = dto.address;
     if (dto.phones !== undefined) fields.phones = normalizePhones(dto.phones);
     if (dto.note !== undefined) fields.note = dto.note;
+    if (dto.is_active !== undefined) fields.is_active = dto.is_active;
 
     this.offices.merge(office, fields);
     const saved = await this.offices.save(office);
