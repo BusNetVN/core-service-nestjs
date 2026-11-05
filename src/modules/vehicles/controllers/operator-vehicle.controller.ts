@@ -26,6 +26,7 @@ import { OperatorUpdateVehicleUseCase } from '../usecases/operator/operator-upda
  *
  * - Luôn làm việc trên nhà xe trong access token (không nhận company_uuid); xe của nhà xe
  *   khác -> 403.
+ * - Tạo/sửa ghi created_by/updated_by là username của tài khoản đang đăng nhập.
  * - Dữ liệu trả về là OperatorVehicle (xem mappers/operator/operator-vehicle.mapper.ts).
  */
 @Controller('operator/vehicles')
@@ -69,7 +70,11 @@ export class OperatorVehicleController {
     @CurrentUser() user: AccessTokenPayload,
     @Body() dto: OperatorCreateVehicleDto,
   ) {
-    return this.createVehicle.execute(requiredCompanyUuidFromToken(user), dto);
+    return this.createVehicle.execute(
+      requiredCompanyUuidFromToken(user),
+      dto,
+      user.username,
+    );
   }
 
   /** PATCH /api/operator/vehicles/:id - cập nhật một phần; không đổi được nhà xe. */
@@ -80,7 +85,12 @@ export class OperatorVehicleController {
     @Param('id', UuidParamPipe) id: string,
     @Body() dto: OperatorUpdateVehicleDto,
   ) {
-    return this.updateVehicle.execute(requiredCompanyUuidFromToken(user), id, dto);
+    return this.updateVehicle.execute(
+      requiredCompanyUuidFromToken(user),
+      id,
+      dto,
+      user.username,
+    );
   }
 
   /** DELETE /api/operator/vehicles/:id */

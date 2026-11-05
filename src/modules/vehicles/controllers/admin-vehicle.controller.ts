@@ -8,8 +8,10 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { CurrentUser } from '../../../common/decorators/current-user.decorator.js';
 import { SystemAdminOnly } from '../../../common/decorators/system-admin-only.decorator.js';
 import { UuidParamPipe } from '../../../common/pipes/uuid-param.pipe.js';
+import type { AccessTokenPayload } from '../../../common/types/access-token-payload.js';
 import { AdminCreateVehicleDto } from '../dto/admin/admin-create-vehicle.dto.js';
 import { AdminUpdateVehicleDto } from '../dto/admin/admin-update-vehicle.dto.js';
 import { AdminCreateVehicleUseCase } from '../usecases/admin/admin-create-vehicle.usecase.js';
@@ -25,6 +27,7 @@ import { AdminUpdateVehicleUseCase } from '../usecases/admin/admin-update-vehicl
  * - Chỉ tài khoản SYSTEM_ADMIN được gọi (@SystemAdminOnly): thiếu/sai token -> 401,
  *   tài khoản khác SYSTEM_ADMIN -> 403.
  * - Biển số không trùng trong cùng nhà xe; chi nhánh (office_uuid) phải thuộc nhà xe của xe.
+ * - Tạo/sửa ghi created_by/updated_by là username của tài khoản đang đăng nhập.
  * - Dữ liệu trả về là AdminVehicle (xem mappers/admin/admin-vehicle.mapper.ts).
  */
 @Controller('admin/vehicles')
@@ -64,17 +67,21 @@ export class AdminVehicleController {
    *      409 biển số đã tồn tại trong nhà xe.
    */
   @Post()
-  create(@Body() dto: AdminCreateVehicleDto) {
-    return this.createVehicle.execute(dto);
+  create(
+    @CurrentUser() user: AccessTokenPayload,
+    @Body() dto: AdminCreateVehicleDto,
+  ) {
+    return this.createVehicle.execute(dto, user.username);
   }
 
   /** PATCH /api/admin/vehicles/:id - cập nhật một phần; không đổi được nhà xe. */
   @Patch(':id')
   update(
+    @CurrentUser() user: AccessTokenPayload,
     @Param('id', UuidParamPipe) id: string,
     @Body() dto: AdminUpdateVehicleDto,
   ) {
-    return this.updateVehicle.execute(id, dto);
+    return this.updateVehicle.execute(id, dto, user.username);
   }
 
   /** DELETE /api/admin/vehicles/:id */

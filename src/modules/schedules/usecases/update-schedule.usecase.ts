@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { RouteRepository } from '../../routes/repository/route.repository.js';
-import { SeatMapRepository } from '../../seat-maps/repository/seat-map.repository.js';
+import { OperatorSeatMapRepository } from '../../seat-maps/repository/operator/operator-seat-map.repository.js';
 import { UpdateScheduleDto } from '../dto/update-schedule.dto.js';
 import { Schedule } from '../entities/schedule.entity.js';
 import {
@@ -17,7 +17,7 @@ export class UpdateScheduleUseCase {
   constructor(
     private readonly schedules: ScheduleRepository,
     private readonly routes: RouteRepository,
-    private readonly seatMaps: SeatMapRepository,
+    private readonly seatMaps: OperatorSeatMapRepository,
   ) {}
 
   async execute(uuid: string, dto: UpdateScheduleDto) {

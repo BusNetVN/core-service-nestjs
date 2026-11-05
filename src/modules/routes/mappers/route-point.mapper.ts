@@ -1,6 +1,6 @@
 import { PointScope } from '../../points/enums/point-scope.enum.js';
 import type { PointTypeValue } from '../../points/enums/point-type.enum.js';
-import { normalizePointCode } from '../../points/mappers/point.mapper.js';
+import { normalizePointCode } from '../../points/mappers/operator/operator-point.mapper.js';
 import { RoutePoint } from '../entities/route-point.entity.js';
 
 export type PublicRoutePointDetail = {
@@ -12,7 +12,7 @@ export type PublicRoutePointDetail = {
   ward_name: string | null;
   province_name: string | null;
   shared: boolean;
-  status: boolean;
+  is_active: boolean;
 };
 
 export type PublicRoutePoint = {
@@ -38,7 +38,7 @@ export function toPublicRoutePoint(routePoint: RoutePoint): PublicRoutePoint {
       ward_name: point.ward?.name ?? null,
       province_name: point.province?.name ?? null,
       shared: scope === PointScope.SYSTEM,
-      status: point.status,
+      is_active: point.is_active,
     },
   };
 }

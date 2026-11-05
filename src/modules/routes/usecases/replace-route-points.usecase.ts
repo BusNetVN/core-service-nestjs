@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { PointRepository } from '../../points/repository/point.repository.js';
+import { OperatorPointRepository } from '../../points/repository/operator/operator-point.repository.js';
 import { ReplaceRoutePointsDto } from '../dto/replace-route-points.dto.js';
 import { toPublicRoutePoint } from '../mappers/route-point.mapper.js';
 import { RouteRepository } from '../repository/route.repository.js';
@@ -10,7 +10,7 @@ export class ReplaceRoutePointsUseCase {
   constructor(
     private readonly routes: RouteRepository,
     private readonly routePoints: RoutePointRepository,
-    private readonly points: PointRepository,
+    private readonly points: OperatorPointRepository,
   ) {}
 
   async execute(routeUuid: string, dto: ReplaceRoutePointsDto) {

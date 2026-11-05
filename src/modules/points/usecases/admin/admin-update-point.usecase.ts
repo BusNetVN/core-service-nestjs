@@ -5,17 +5,17 @@ import { WardRepository } from '../../../locations/repository/ward.repository.js
 import { AdminUpdatePointDto } from '../../dto/admin/admin-update-point.dto.js';
 import { Point } from '../../entities/point.entity.js';
 import type { PointTypeValue } from '../../enums/point-type.enum.js';
-import { normalizePointCode, toPublicPoint } from '../../mappers/point.mapper.js';
-import { PointRepository } from '../../repository/point.repository.js';
-import { resolveAllowedCompanies } from '../resolve-allowed-companies.js';
-import { resolvePointLocation } from '../resolve-point-location.js';
-import { findSharedPoint } from './find-shared-point.js';
+import { normalizePointCode, toAdminPoint } from '../../mappers/admin/admin-point.mapper.js';
+import { AdminPointRepository } from '../../repository/admin/admin-point.repository.js';
+import { resolveAdminAllowedCompanies } from './admin-resolve-allowed-companies.js';
+import { resolveAdminPointLocation } from './admin-resolve-point-location.js';
+import { findAdminSharedPoint } from './admin-find-shared-point.js';
 
 /** Partial update of a shared point; company points are managed by their company. */
 @Injectable()
 export class AdminUpdatePointUseCase {
   constructor(
-    private readonly points: PointRepository,
+    private readonly points: AdminPointRepository,
     private readonly companies: CompanyRepository,
     private readonly provinces: ProvinceRepository,
     private readonly wards: WardRepository,
@@ -23,7 +23,7 @@ export class AdminUpdatePointUseCase {
 
   /** `actorUsername` is the username of the admin updating the point. */
   async execute(uuid: string, dto: AdminUpdatePointDto, actorUsername: string) {
-    const point = await findSharedPoint(this.points, uuid);
+    const point = await findAdminSharedPoint(this.points, uuid);
     const fields: Partial<Point> = { updated_by: actorUsername || null };
 
     if (dto.point_code !== undefined) {
@@ -41,10 +41,10 @@ export class AdminUpdatePointUseCase {
     }
     if (dto.address !== undefined) fields.address = dto.address;
     if (dto.note !== undefined) fields.note = dto.note;
-    if (dto.status !== undefined) fields.status = dto.status;
+    if (dto.is_active !== undefined) fields.is_active = dto.is_active;
 
     if (dto.province_uuid !== undefined || dto.ward_uuid !== undefined) {
-      const location = await resolvePointLocation(
+      const location = await resolveAdminPointLocation(
         this.provinces,
         this.wards,
         dto.province_uuid,
@@ -56,7 +56,7 @@ export class AdminUpdatePointUseCase {
       point.ward = location.ward;
     }
 
-    const allowedCompanies = await resolveAllowedCompanies(
+    const allowedCompanies = await resolveAdminAllowedCompanies(
       this.companies,
       dto.allowed_company_uuids,
     );
@@ -72,6 +72,6 @@ export class AdminUpdatePointUseCase {
     saved.province = point.province;
     saved.ward = point.ward;
     saved.allowed_companies ??= point.allowed_companies;
-    return toPublicPoint(saved);
+    return toAdminPoint(saved);
   }
 }

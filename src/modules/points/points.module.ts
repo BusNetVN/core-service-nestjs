@@ -5,19 +5,21 @@ import { Company } from '../companies/entities/company.entity.js';
 import { LocationsModule } from '../locations/locations.module.js';
 import { Province } from '../locations/entities/province.entity.js';
 import { Ward } from '../locations/entities/ward.entity.js';
-import { AdminPointsController } from './controllers/admin-points.controller.js';
-import { PointsController } from './controllers/points.controller.js';
+import { AdminPointController } from './controllers/admin-point.controller.js';
+import { OperatorPointController } from './controllers/operator-point.controller.js';
 import { Point } from './entities/point.entity.js';
-import { PointRepository } from './repository/point.repository.js';
+import { AdminPointRepository } from './repository/admin/admin-point.repository.js';
+import { OperatorPointRepository } from './repository/operator/operator-point.repository.js';
 import { AdminCreatePointUseCase } from './usecases/admin/admin-create-point.usecase.js';
 import { AdminDeletePointUseCase } from './usecases/admin/admin-delete-point.usecase.js';
 import { AdminFindAllPointsUseCase } from './usecases/admin/admin-find-all-points.usecase.js';
+import { AdminFindPointUseCase } from './usecases/admin/admin-find-point.usecase.js';
 import { AdminUpdatePointUseCase } from './usecases/admin/admin-update-point.usecase.js';
-import { CreatePointUseCase } from './usecases/create-point.usecase.js';
-import { FindAllPointsUseCase } from './usecases/find-all-points.usecase.js';
-import { FindPointUseCase } from './usecases/find-point.usecase.js';
-import { RemovePointUseCase } from './usecases/remove-point.usecase.js';
-import { UpdatePointUseCase } from './usecases/update-point.usecase.js';
+import { OperatorCreatePointUseCase } from './usecases/operator/operator-create-point.usecase.js';
+import { OperatorDeletePointUseCase } from './usecases/operator/operator-delete-point.usecase.js';
+import { OperatorFindAllPointsUseCase } from './usecases/operator/operator-find-all-points.usecase.js';
+import { OperatorFindPointUseCase } from './usecases/operator/operator-find-point.usecase.js';
+import { OperatorUpdatePointUseCase } from './usecases/operator/operator-update-point.usecase.js';
 
 @Module({
   imports: [
@@ -25,19 +27,22 @@ import { UpdatePointUseCase } from './usecases/update-point.usecase.js';
     CompaniesModule,
     LocationsModule,
   ],
-  controllers: [PointsController, AdminPointsController],
+  controllers: [AdminPointController, OperatorPointController],
   providers: [
-    PointRepository,
+    AdminPointRepository,
+    OperatorPointRepository,
     AdminFindAllPointsUseCase,
+    AdminFindPointUseCase,
     AdminCreatePointUseCase,
     AdminUpdatePointUseCase,
     AdminDeletePointUseCase,
-    FindAllPointsUseCase,
-    FindPointUseCase,
-    CreatePointUseCase,
-    UpdatePointUseCase,
-    RemovePointUseCase,
+    OperatorFindAllPointsUseCase,
+    OperatorFindPointUseCase,
+    OperatorCreatePointUseCase,
+    OperatorUpdatePointUseCase,
+    OperatorDeletePointUseCase,
   ],
-  exports: [PointRepository],
+  // Routes (company scoped) check that the chosen points are usable by the route's company.
+  exports: [OperatorPointRepository],
 })
 export class PointsModule {}

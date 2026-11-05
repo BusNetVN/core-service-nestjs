@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CompanyRepository } from '../../../companies/repository/company.repository.js';
 import { PointScope, type PointScopeValue } from '../../enums/point-scope.enum.js';
-import { toPublicPoint } from '../../mappers/point.mapper.js';
-import { PointRepository } from '../../repository/point.repository.js';
+import { toAdminPoint } from '../../mappers/admin/admin-point.mapper.js';
+import { AdminPointRepository } from '../../repository/admin/admin-point.repository.js';
 
 const UUID_V4 =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -16,7 +16,7 @@ const SCOPE_BY_QUERY: Record<string, PointScopeValue> = {
 @Injectable()
 export class AdminFindAllPointsUseCase {
   constructor(
-    private readonly points: PointRepository,
+    private readonly points: AdminPointRepository,
     private readonly companies: CompanyRepository,
   ) {}
 
@@ -37,11 +37,11 @@ export class AdminFindAllPointsUseCase {
       companyId = (await this.companies.findByUuid(options.companyUuid)).id;
     }
 
-    const points = await this.points.findAllForAdmin({
+    const points = await this.points.findAll({
       scope: companyId ? PointScope.COMPANY : scope,
       companyId,
       query: options.query,
     });
-    return points.map(toPublicPoint);
+    return points.map(toAdminPoint);
   }
 }

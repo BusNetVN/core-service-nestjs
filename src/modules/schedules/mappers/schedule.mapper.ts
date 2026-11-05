@@ -5,7 +5,7 @@ import { SeatMapType } from '../../seat-maps/enums/seat-map-type.enum.js';
 import {
   countSeats,
   normalizeSeats,
-} from '../../seat-maps/mappers/seat-map.mapper.js';
+} from '../../seat-maps/mappers/operator/operator-seat-map.mapper.js';
 import { Schedule } from '../entities/schedule.entity.js';
 import { WeekdayMode } from '../enums/weekday-mode.enum.js';
 

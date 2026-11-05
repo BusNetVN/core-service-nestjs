@@ -96,8 +96,9 @@ export class Point {
   @Column({ type: 'text', default: '' })
   note: string;
 
+  /** false when the point is no longer used; it is kept for the routes that pass through it. */
   @Column({ type: 'boolean', default: true })
-  status: boolean;
+  is_active: boolean;
 
   @ManyToMany(() => Company)
   @JoinTable({

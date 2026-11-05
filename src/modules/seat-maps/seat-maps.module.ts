@@ -2,26 +2,40 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CompaniesModule } from '../companies/companies.module.js';
 import { Company } from '../companies/entities/company.entity.js';
-import { SeatMapsController } from './controllers/seat-maps.controller.js';
+import { AdminSeatMapController } from './controllers/admin-seat-map.controller.js';
+import { OperatorSeatMapController } from './controllers/operator-seat-map.controller.js';
 import { SeatMap } from './entities/seat-map.entity.js';
-import { SeatMapRepository } from './repository/seat-map.repository.js';
-import { CreateSeatMapUseCase } from './usecases/create-seat-map.usecase.js';
-import { FindAllSeatMapsUseCase } from './usecases/find-all-seat-maps.usecase.js';
-import { FindSeatMapUseCase } from './usecases/find-seat-map.usecase.js';
-import { RemoveSeatMapUseCase } from './usecases/remove-seat-map.usecase.js';
-import { UpdateSeatMapUseCase } from './usecases/update-seat-map.usecase.js';
+import { AdminSeatMapRepository } from './repository/admin/admin-seat-map.repository.js';
+import { OperatorSeatMapRepository } from './repository/operator/operator-seat-map.repository.js';
+import { AdminCreateSeatMapUseCase } from './usecases/admin/admin-create-seat-map.usecase.js';
+import { AdminDeleteSeatMapUseCase } from './usecases/admin/admin-delete-seat-map.usecase.js';
+import { AdminFindAllSeatMapsUseCase } from './usecases/admin/admin-find-all-seat-maps.usecase.js';
+import { AdminFindSeatMapUseCase } from './usecases/admin/admin-find-seat-map.usecase.js';
+import { AdminUpdateSeatMapUseCase } from './usecases/admin/admin-update-seat-map.usecase.js';
+import { OperatorCreateSeatMapUseCase } from './usecases/operator/operator-create-seat-map.usecase.js';
+import { OperatorDeleteSeatMapUseCase } from './usecases/operator/operator-delete-seat-map.usecase.js';
+import { OperatorFindAllSeatMapsUseCase } from './usecases/operator/operator-find-all-seat-maps.usecase.js';
+import { OperatorFindSeatMapUseCase } from './usecases/operator/operator-find-seat-map.usecase.js';
+import { OperatorUpdateSeatMapUseCase } from './usecases/operator/operator-update-seat-map.usecase.js';
 
 @Module({
   imports: [TypeOrmModule.forFeature([SeatMap, Company]), CompaniesModule],
-  controllers: [SeatMapsController],
+  controllers: [AdminSeatMapController, OperatorSeatMapController],
   providers: [
-    SeatMapRepository,
-    FindAllSeatMapsUseCase,
-    FindSeatMapUseCase,
-    CreateSeatMapUseCase,
-    UpdateSeatMapUseCase,
-    RemoveSeatMapUseCase,
+    AdminSeatMapRepository,
+    OperatorSeatMapRepository,
+    AdminFindAllSeatMapsUseCase,
+    AdminFindSeatMapUseCase,
+    AdminCreateSeatMapUseCase,
+    AdminUpdateSeatMapUseCase,
+    AdminDeleteSeatMapUseCase,
+    OperatorFindAllSeatMapsUseCase,
+    OperatorFindSeatMapUseCase,
+    OperatorCreateSeatMapUseCase,
+    OperatorUpdateSeatMapUseCase,
+    OperatorDeleteSeatMapUseCase,
   ],
-  exports: [SeatMapRepository],
+  // Schedules and fares (company scoped) look up the seat map they are attached to.
+  exports: [OperatorSeatMapRepository],
 })
 export class SeatMapsModule {}

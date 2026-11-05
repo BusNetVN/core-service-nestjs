@@ -19,7 +19,12 @@ export class OperatorCreateVehicleUseCase {
     private readonly offices: OperatorOfficeRepository,
   ) {}
 
-  async execute(companyUuid: string, dto: OperatorCreateVehicleDto) {
+  /** `actorUsername` is the username of the staff member creating the vehicle. */
+  async execute(
+    companyUuid: string,
+    dto: OperatorCreateVehicleDto,
+    actorUsername: string,
+  ) {
     const company = await this.companies.findByUuid(companyUuid);
     const licensePlate = normalizeLicensePlate(dto.license_plate);
     await this.vehicles.assertUniquePlate(company.id, licensePlate);
@@ -50,6 +55,8 @@ export class OperatorCreateVehicleUseCase {
       registration_date: dto.registration_date ?? null,
       condition: dto.condition ?? VehicleCondition.New,
       status: dto.status ?? VehicleStatus.InUse,
+      created_by: actorUsername || null,
+      updated_by: actorUsername || null,
       office: null,
       ...office,
     });

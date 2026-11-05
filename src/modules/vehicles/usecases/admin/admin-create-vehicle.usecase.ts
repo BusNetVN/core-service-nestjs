@@ -19,7 +19,8 @@ export class AdminCreateVehicleUseCase {
     private readonly offices: AdminOfficeRepository,
   ) {}
 
-  async execute(dto: AdminCreateVehicleDto) {
+  /** `actorUsername` is the username of the admin creating the vehicle. */
+  async execute(dto: AdminCreateVehicleDto, actorUsername: string) {
     const company = await this.companies.findByUuid(dto.company_uuid);
     const licensePlate = normalizeLicensePlate(dto.license_plate);
     await this.vehicles.assertUniquePlate(company.id, licensePlate);
@@ -50,6 +51,8 @@ export class AdminCreateVehicleUseCase {
       registration_date: dto.registration_date ?? null,
       condition: dto.condition ?? VehicleCondition.New,
       status: dto.status ?? VehicleStatus.InUse,
+      created_by: actorUsername || null,
+      updated_by: actorUsername || null,
       office: null,
       ...office,
     });

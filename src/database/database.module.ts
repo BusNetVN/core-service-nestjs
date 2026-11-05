@@ -11,9 +11,11 @@ import { migratePermissionAudit } from './migrate-permission-audit.js';
 import { migrateUserAudit } from './migrate-user-audit.js';
 import { migrateUserCompanyFk } from './migrate-user-company-fk.js';
 import { migratePointAllowedCompanies } from './migrate-point-allowed-companies.js';
+import { migratePointIsActive } from './migrate-point-is-active.js';
 import { migratePointScope } from './migrate-point-scope.js';
 import { migratePointType } from './migrate-point-type.js';
 import { migrateRoutePointTable } from './migrate-route-point-table.js';
+import { migrateSeatMapIsActive } from './migrate-seat-map-is-active.js';
 
 // "timestamp without time zone" columns hold UTC wall-clock times (they default to now()
 // on a UTC server, and Spring/EF wrote UTC too). pg would otherwise read them as the
@@ -102,6 +104,8 @@ function sslOption(host: string, sslMode?: string) {
         await migratePointScope(dataSource);
         await migratePointType(dataSource);
         await migrateRoutePointTable(dataSource);
+        await migrateSeatMapIsActive(dataSource);
+        await migratePointIsActive(dataSource);
         if (synchronize) {
           await dataSource.synchronize();
         }

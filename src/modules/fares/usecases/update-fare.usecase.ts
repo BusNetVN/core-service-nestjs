@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { RoutePointRepository } from '../../routes/repository/route-point.repository.js';
 import { RouteRepository } from '../../routes/repository/route.repository.js';
 import { ScheduleRepository } from '../../schedules/repository/schedule.repository.js';
-import { SeatMapRepository } from '../../seat-maps/repository/seat-map.repository.js';
+import { OperatorSeatMapRepository } from '../../seat-maps/repository/operator/operator-seat-map.repository.js';
 import { UpdateFareDto } from '../dto/update-fare.dto.js';
 import { toPublicFare } from '../mappers/fare.mapper.js';
 import { FareRepository } from '../repository/fare.repository.js';
@@ -19,7 +19,7 @@ export class UpdateFareUseCase {
     private readonly routes: RouteRepository,
     private readonly routePoints: RoutePointRepository,
     private readonly schedules: ScheduleRepository,
-    private readonly seatMaps: SeatMapRepository,
+    private readonly seatMaps: OperatorSeatMapRepository,
   ) {}
 
   async execute(uuid: string, dto: UpdateFareDto) {

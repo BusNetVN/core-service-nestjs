@@ -25,11 +25,17 @@ export class OperatorUpdateVehicleUseCase {
     private readonly offices: OperatorOfficeRepository,
   ) {}
 
-  async execute(companyUuid: string, uuid: string, dto: OperatorUpdateVehicleDto) {
+  /** `actorUsername` is the username of the staff member updating the vehicle. */
+  async execute(
+    companyUuid: string,
+    uuid: string,
+    dto: OperatorUpdateVehicleDto,
+    actorUsername: string,
+  ) {
     const vehicle = await findCompanyVehicle(this.vehicles, companyUuid, uuid);
     const { office_uuid, license_plate, ...plain } = dto;
 
-    const fields: Partial<Vehicle> = {};
+    const fields: Partial<Vehicle> = { updated_by: actorUsername || null };
     for (const [key, value] of Object.entries(plain)) {
       if (value !== undefined && (value !== null || NULLABLE.has(key))) {
         (fields as Record<string, unknown>)[key] = value;

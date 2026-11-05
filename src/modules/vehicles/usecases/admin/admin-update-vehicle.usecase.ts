@@ -24,11 +24,12 @@ export class AdminUpdateVehicleUseCase {
     private readonly offices: AdminOfficeRepository,
   ) {}
 
-  async execute(uuid: string, dto: AdminUpdateVehicleDto) {
+  /** `actorUsername` is the username of the admin updating the vehicle. */
+  async execute(uuid: string, dto: AdminUpdateVehicleDto, actorUsername: string) {
     const vehicle = await this.vehicles.findByUuid(uuid);
     const { office_uuid, license_plate, ...plain } = dto;
 
-    const fields: Partial<Vehicle> = {};
+    const fields: Partial<Vehicle> = { updated_by: actorUsername || null };
     for (const [key, value] of Object.entries(plain)) {
       if (value !== undefined && (value !== null || NULLABLE.has(key))) {
         (fields as Record<string, unknown>)[key] = value;

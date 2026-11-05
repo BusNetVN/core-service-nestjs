@@ -24,6 +24,8 @@ export type OperatorVehicle = {
   office: { id: string; office_code: string; name: string } | null;
   condition: VehicleCondition;
   status: VehicleStatus;
+  created_by: string | null;
+  updated_by: string | null;
   created_at: Date;
   updated_at: Date;
 };
@@ -61,6 +63,8 @@ export function toOperatorVehicle(vehicle: Vehicle): OperatorVehicle {
       : null,
     condition: vehicle.condition,
     status: vehicle.status,
+    created_by: vehicle.created_by,
+    updated_by: vehicle.updated_by,
     created_at: vehicle.created_at,
     updated_at: vehicle.updated_at,
   };

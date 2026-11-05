@@ -67,7 +67,7 @@ export class AdminCreatePointDto {
 
   @IsOptional()
   @IsBoolean()
-  status?: boolean;
+  is_active?: boolean;
 
   /** Companies allowed to use the point; an empty list means every company. */
   @IsOptional()

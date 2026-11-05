@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CompanyRepository } from '../../companies/repository/company.repository.js';
 import { RouteRepository } from '../../routes/repository/route.repository.js';
-import { SeatMapRepository } from '../../seat-maps/repository/seat-map.repository.js';
+import { OperatorSeatMapRepository } from '../../seat-maps/repository/operator/operator-seat-map.repository.js';
 import { CreateScheduleDto } from '../dto/create-schedule.dto.js';
 import {
   normalizeDepartureTime,
@@ -18,7 +18,7 @@ export class CreateScheduleUseCase {
     private readonly schedules: ScheduleRepository,
     private readonly companies: CompanyRepository,
     private readonly routes: RouteRepository,
-    private readonly seatMaps: SeatMapRepository,
+    private readonly seatMaps: OperatorSeatMapRepository,
   ) {}
 
   async execute(dto: CreateScheduleDto) {

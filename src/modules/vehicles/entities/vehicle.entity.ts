@@ -118,6 +118,17 @@ export class Vehicle {
   @Column({ type: 'varchar', length: 32, default: VehicleStatus.InUse })
   status: VehicleStatus;
 
+  /**
+   * Username of the account that created the vehicle, as it was at that time
+   * (not a foreign key, so it survives renames and deletions); null for older rows.
+   */
+  @Column({ type: 'varchar', length: 64, nullable: true })
+  created_by: string | null;
+
+  /** Username of the account that last updated the vehicle. */
+  @Column({ type: 'varchar', length: 64, nullable: true })
+  updated_by: string | null;
+
   @CreateDateColumn()
   created_at: Date;
 

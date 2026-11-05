@@ -83,8 +83,20 @@ export class SeatMap {
   @Column({ type: 'text', default: '' })
   note: string;
 
+  /** false when the seat map is no longer used; it is kept for schedules and trips that use it. */
   @Column({ type: 'boolean', default: true })
-  status: boolean;
+  is_active: boolean;
+
+  /**
+   * Username of the account that created the seat map, as it was at that time
+   * (not a foreign key, so it survives renames and deletions); null for older rows.
+   */
+  @Column({ type: 'varchar', length: 64, nullable: true })
+  created_by: string | null;
+
+  /** Username of the account that last updated the seat map. */
+  @Column({ type: 'varchar', length: 64, nullable: true })
+  updated_by: string | null;
 
   @CreateDateColumn()
   created_at: Date;

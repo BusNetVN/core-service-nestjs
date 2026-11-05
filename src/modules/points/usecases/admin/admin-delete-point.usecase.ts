@@ -1,8 +1,8 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { isForeignKeyViolation } from '../../../../common/utils/database-error.js';
-import { normalizePointCode } from '../../mappers/point.mapper.js';
-import { PointRepository } from '../../repository/point.repository.js';
-import { findSharedPoint } from './find-shared-point.js';
+import { normalizePointCode } from '../../mappers/admin/admin-point.mapper.js';
+import { AdminPointRepository } from '../../repository/admin/admin-point.repository.js';
+import { findAdminSharedPoint } from './admin-find-shared-point.js';
 
 /**
  * Hard delete of a shared point. Its allowed-company links go with it (ON DELETE CASCADE);
@@ -10,10 +10,10 @@ import { findSharedPoint } from './find-shared-point.js';
  */
 @Injectable()
 export class AdminDeletePointUseCase {
-  constructor(private readonly points: PointRepository) {}
+  constructor(private readonly points: AdminPointRepository) {}
 
   async execute(uuid: string) {
-    const point = await findSharedPoint(this.points, uuid);
+    const point = await findAdminSharedPoint(this.points, uuid);
     try {
       await this.points.remove(point);
     } catch (error) {
