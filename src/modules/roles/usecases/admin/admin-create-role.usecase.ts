@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { CompanyRepository } from '../../../companies/repository/company.repository.js';
-import { PermissionRepository } from '../../../permissions/repository/permission.repository.js';
+import { AdminPermissionRepository } from '../../../permissions/repository/admin/admin-permission.repository.js';
 import { AdminCreateRoleDto } from '../../dto/admin/admin-create-role.dto.js';
-import { toPublicRole } from '../../mappers/role.mapper.js';
-import { RoleRepository } from '../../repository/role.repository.js';
+import { toAdminRole } from '../../mappers/admin/admin-role.mapper.js';
+import { AdminRoleRepository } from '../../repository/admin/admin-role.repository.js';
 
 @Injectable()
 export class AdminCreateRoleUseCase {
   constructor(
-    private readonly roles: RoleRepository,
+    private readonly roles: AdminRoleRepository,
     private readonly companies: CompanyRepository,
-    private readonly permissions: PermissionRepository,
+    private readonly permissions: AdminPermissionRepository,
   ) {}
 
   /** `actorUsername` is the username of the admin creating the role. */
@@ -35,6 +35,6 @@ export class AdminCreateRoleUseCase {
       }),
     );
     saved.company = company;
-    return toPublicRole(saved);
+    return toAdminRole(saved);
   }
 }

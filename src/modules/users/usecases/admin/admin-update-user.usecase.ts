@@ -1,34 +1,34 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { hash } from 'bcryptjs';
 import { CompanyRepository } from '../../../companies/repository/company.repository.js';
-import { RoleRepository } from '../../../roles/repository/role.repository.js';
+import { AdminRoleRepository } from '../../../roles/repository/admin/admin-role.repository.js';
 import { AdminUpdateUserDto } from '../../dto/admin/admin-update-user.dto.js';
 import {
   normalizeEmail,
   normalizeUsername,
-  toPublicUser,
-} from '../../mappers/user.mapper.js';
-import { UserRoleRepository } from '../../repository/user-role.repository.js';
-import { UserRepository } from '../../repository/user.repository.js';
-import type { UserActor } from '../user-actor.js';
+  toAdminUser,
+} from '../../mappers/admin/admin-user.mapper.js';
+import { AdminUserRoleRepository } from '../../repository/admin/admin-user-role.repository.js';
+import { AdminUserRepository } from '../../repository/admin/admin-user.repository.js';
+import type { AdminUserActor } from './admin-user-actor.js';
 import {
   resolveUserCompany,
   resolveUserRoles,
   resolveUserStaffRole,
-} from '../resolve-user-assignment.js';
+} from './admin-resolve-user-assignment.js';
 import { PASSWORD_HASH_ROUNDS } from './admin-create-user.usecase.js';
 
 @Injectable()
 export class AdminUpdateUserUseCase {
   constructor(
-    private readonly users: UserRepository,
+    private readonly users: AdminUserRepository,
     private readonly companies: CompanyRepository,
-    private readonly roles: RoleRepository,
-    private readonly userRoles: UserRoleRepository,
+    private readonly roles: AdminRoleRepository,
+    private readonly userRoles: AdminUserRoleRepository,
   ) {}
 
   /** `actor` is the signed-in admin: its uuid blocks self-locking, its username is recorded as updater. */
-  async execute(uuid: string, dto: AdminUpdateUserDto, actor: UserActor) {
+  async execute(uuid: string, dto: AdminUpdateUserDto, actor: AdminUserActor) {
     const user = await this.users.findActiveByUuid(uuid);
     const accountType = dto.account_type ?? user.account_type;
 
@@ -83,6 +83,6 @@ export class AdminUpdateUserUseCase {
 
     const saved = await this.users.save(user);
     await this.userRoles.replace(saved.id, roles);
-    return toPublicUser(saved, roles);
+    return toAdminUser(saved, roles);
   }
 }

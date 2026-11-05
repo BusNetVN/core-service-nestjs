@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CompanyRepository } from '../../../companies/repository/company.repository.js';
-import { toPublicRole } from '../../mappers/role.mapper.js';
-import { RoleRepository } from '../../repository/role.repository.js';
+import { toAdminRole } from '../../mappers/admin/admin-role.mapper.js';
+import { AdminRoleRepository } from '../../repository/admin/admin-role.repository.js';
 
 const UUID_V4 =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -10,7 +10,7 @@ const UUID_V4 =
 @Injectable()
 export class AdminFindAllRolesUseCase {
   constructor(
-    private readonly roles: RoleRepository,
+    private readonly roles: AdminRoleRepository,
     private readonly companies: CompanyRepository,
   ) {}
 
@@ -24,6 +24,6 @@ export class AdminFindAllRolesUseCase {
     }
 
     const roles = await this.roles.findAll({ companyId, query: options.query });
-    return roles.map(toPublicRole);
+    return roles.map(toAdminRole);
   }
 }

@@ -1,30 +1,30 @@
 import { Injectable } from '@nestjs/common';
 import { hash } from 'bcryptjs';
 import { CompanyRepository } from '../../../companies/repository/company.repository.js';
-import { RoleRepository } from '../../../roles/repository/role.repository.js';
+import { AdminRoleRepository } from '../../../roles/repository/admin/admin-role.repository.js';
 import { AdminCreateUserDto } from '../../dto/admin/admin-create-user.dto.js';
 import {
   normalizeEmail,
   normalizeUsername,
-  toPublicUser,
-} from '../../mappers/user.mapper.js';
-import { UserRoleRepository } from '../../repository/user-role.repository.js';
-import { UserRepository } from '../../repository/user.repository.js';
+  toAdminUser,
+} from '../../mappers/admin/admin-user.mapper.js';
+import { AdminUserRoleRepository } from '../../repository/admin/admin-user-role.repository.js';
+import { AdminUserRepository } from '../../repository/admin/admin-user.repository.js';
 import {
   resolveUserCompany,
   resolveUserRoles,
   resolveUserStaffRole,
-} from '../resolve-user-assignment.js';
+} from './admin-resolve-user-assignment.js';
 
 export const PASSWORD_HASH_ROUNDS = 10;
 
 @Injectable()
 export class AdminCreateUserUseCase {
   constructor(
-    private readonly users: UserRepository,
+    private readonly users: AdminUserRepository,
     private readonly companies: CompanyRepository,
-    private readonly roles: RoleRepository,
-    private readonly userRoles: UserRoleRepository,
+    private readonly roles: AdminRoleRepository,
+    private readonly userRoles: AdminUserRoleRepository,
   ) {}
 
   /** `actorUsername` is the username of the admin creating the user. */
@@ -64,6 +64,6 @@ export class AdminCreateUserUseCase {
     });
     const saved = await this.users.save(user);
     await this.userRoles.replace(saved.id, roles);
-    return toPublicUser(saved, roles);
+    return toAdminUser(saved, roles);
   }
 }

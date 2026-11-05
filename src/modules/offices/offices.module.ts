@@ -35,7 +35,7 @@ import { OperatorUpdateOfficeUseCase } from './usecases/operator/operator-update
     OperatorUpdateOfficeUseCase,
     OperatorDeleteOfficeUseCase,
   ],
-  // Vehicles (company staff) check that the chosen office belongs to their company.
-  exports: [OperatorOfficeRepository],
+  // Vehicles check that the chosen office belongs to the vehicle's company (admin and operator APIs).
+  exports: [AdminOfficeRepository, OperatorOfficeRepository],
 })
 export class OfficesModule {}

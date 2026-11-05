@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { TokenService } from '../../../../common/services/token.service.js';
-import { UserRepository } from '../../../users/repository/user.repository.js';
+import { AdminUserRepository } from '../../../users/repository/admin/admin-user.repository.js';
 import { AdminLoginDto } from '../../dto/admin/admin-login.dto.js';
 import {
   toAdminLoginResponse,
@@ -17,7 +17,7 @@ import { findAdminAccountByCredentials } from './admin-find-account-by-credentia
 @Injectable()
 export class AdminLoginUseCase {
   constructor(
-    private readonly users: UserRepository,
+    private readonly users: AdminUserRepository,
     private readonly sessions: AdminAuthSessionRepository,
     private readonly tokens: TokenService,
   ) {}

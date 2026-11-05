@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { UserRepository } from '../../repository/user.repository.js';
-import type { UserActor } from '../user-actor.js';
+import { AdminUserRepository } from '../../repository/admin/admin-user.repository.js';
+import type { AdminUserActor } from './admin-user-actor.js';
 
 /**
  * Soft delete: the row is kept (username stays reserved) and the account is locked so it
@@ -8,9 +8,9 @@ import type { UserActor } from '../user-actor.js';
  */
 @Injectable()
 export class AdminDeleteUserUseCase {
-  constructor(private readonly users: UserRepository) {}
+  constructor(private readonly users: AdminUserRepository) {}
 
-  async execute(uuid: string, actor: UserActor) {
+  async execute(uuid: string, actor: AdminUserActor) {
     const user = await this.users.findActiveByUuid(uuid);
     if (user.uuid === actor.uuid) {
       throw new BadRequestException('Không thể xóa tài khoản đang đăng nhập.');

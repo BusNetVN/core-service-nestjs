@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { toPublicUser } from '../../mappers/user.mapper.js';
-import { UserRoleRepository } from '../../repository/user-role.repository.js';
-import { UserRepository } from '../../repository/user.repository.js';
+import { toAdminUser } from '../../mappers/admin/admin-user.mapper.js';
+import { AdminUserRoleRepository } from '../../repository/admin/admin-user-role.repository.js';
+import { AdminUserRepository } from '../../repository/admin/admin-user.repository.js';
 
 const UUID_V4 =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -9,15 +9,11 @@ const UUID_V4 =
 @Injectable()
 export class AdminFindAllUsersUseCase {
   constructor(
-    private readonly users: UserRepository,
-    private readonly userRoles: UserRoleRepository,
+    private readonly users: AdminUserRepository,
+    private readonly userRoles: AdminUserRoleRepository,
   ) {}
 
-  async execute(options: {
-    companyUuid?: string;
-    accountType?: string;
-    query?: string;
-  }) {
+  async execute(options: { companyUuid?: string; query?: string }) {
     if (options.companyUuid && !UUID_V4.test(options.companyUuid)) {
       throw new BadRequestException('Nhà xe không hợp lệ.');
     }
@@ -25,6 +21,6 @@ export class AdminFindAllUsersUseCase {
     const rolesByUser = await this.userRoles.findRolesByUserIds(
       users.map((user) => user.id),
     );
-    return users.map((user) => toPublicUser(user, rolesByUser.get(user.id)));
+    return users.map((user) => toAdminUser(user, rolesByUser.get(user.id)));
   }
 }

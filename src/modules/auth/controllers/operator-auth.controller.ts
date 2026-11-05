@@ -25,7 +25,7 @@ import { clientInfo } from '../utils/operator/operator-session-token.js';
  *
  * - Chỉ tài khoản COMPANY_STAFF đang hoạt động, thuộc một nhà xe đang hoạt động, được đăng nhập.
  * - Kết quả login/refresh: access_token, refresh_token, token_type, expires_in và account
- *   (PublicUser kèm roles và permissions). permissions là mọi mã chức năng tài khoản được
+ *   (OperatorUser kèm roles và permissions). permissions là mọi mã chức năng tài khoản được
  *   dùng (từ nhóm quyền đang hoạt động + quyền mặc định theo staff_role), đã chuẩn hóa dạng
  *   "ROUTE_UPDATE".
  * - Access token mang mã chức năng của các nhóm quyền; đổi nhóm quyền có hiệu lực từ lần

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { TokenService } from '../../../../common/services/token.service.js';
-import { UserRepository } from '../../../users/repository/user.repository.js';
+import { OperatorUserRepository } from '../../../users/repository/operator/operator-user.repository.js';
 import { OperatorLoginDto } from '../../dto/operator/operator-login.dto.js';
 import {
   toOperatorLoginResponse,
@@ -18,7 +18,7 @@ import { findOperatorAccountByCredentials } from './operator-find-account-by-cre
 @Injectable()
 export class OperatorLoginUseCase {
   constructor(
-    private readonly users: UserRepository,
+    private readonly users: OperatorUserRepository,
     private readonly sessions: OperatorAuthSessionRepository,
     private readonly tokens: TokenService,
     private readonly access: OperatorAccessLoader,

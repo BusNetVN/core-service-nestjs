@@ -34,7 +34,7 @@ import { AdminUpdateUserUseCase } from '../usecases/admin/admin-update-user.usec
  * - Xóa là xóa mềm: giữ bản ghi (tên đăng nhập vẫn bị giữ chỗ), khóa tài khoản và ẩn khỏi
  *   danh sách; tài khoản đã xóa được coi như không tồn tại (404).
  * - Tạo/sửa/xóa ghi created_by/updated_by là username của tài khoản đang đăng nhập.
- * - Dữ liệu trả về là PublicUser (xem user.mapper.ts): `id` là uuid, username, full_name,
+ * - Dữ liệu trả về là AdminUser (xem mappers/admin/admin-user.mapper.ts): `id` là uuid, username, full_name,
  *   email, phone, company_uuid, account_type, staff_role, roles ({ id, name }[] sắp theo
  *   tên), status, created_by/updated_by, created_at/updated_at. Không bao giờ trả về mật khẩu.
  */
@@ -56,7 +56,7 @@ export class AdminUsersController {
    * Vào: `q` (tùy chọn) - từ khóa, tìm không phân biệt hoa thường theo tên đăng nhập, họ tên,
    *      email, số điện thoại.
    *      `company_uuid` (tùy chọn) - chỉ lấy tài khoản thuộc nhà xe này.
-   * Ra:  PublicUser[].
+   * Ra:  AdminUser[].
    * Lỗi: 400 company_uuid sai định dạng.
    */
   @Get()
@@ -72,7 +72,7 @@ export class AdminUsersController {
    * Xem chi tiết một tài khoản.
    *
    * Vào: `id` - uuid v4 của tài khoản (sai định dạng -> 400 "ID không hợp lệ.").
-   * Ra:  PublicUser; không tồn tại hoặc đã xóa -> 404 "Không tìm thấy người dùng.".
+   * Ra:  AdminUser; không tồn tại hoặc đã xóa -> 404 "Không tìm thấy người dùng.".
    */
   @Get(':id')
   findOne(@Param('id', UuidParamPipe) id: string) {
@@ -86,7 +86,7 @@ export class AdminUsersController {
    * Vào: body AdminCreateUserDto - bắt buộc username (chữ, số, dấu . _ -, tối đa 64 ký tự, lưu chữ
    *      thường), password (8-72 ký tự, lưu dạng bcrypt), account_type; full_name, email (lưu
    *      chữ thường), phone, company_uuid, staff_role, role_ids, status (mặc định true) tùy chọn.
-   * Ra:  201 + PublicUser vừa tạo.
+   * Ra:  201 + AdminUser vừa tạo.
    * Lỗi: 400 dữ liệu không hợp lệ, thiếu nhà xe/vai trò theo loại tài khoản, nhà xe không
    *      tồn tại hoặc nhóm quyền không thuộc nhà xe; 409 tên đăng nhập đã tồn tại (kể cả tài khoản đã xóa) hoặc email đã tồn tại.
    */
@@ -105,7 +105,7 @@ export class AdminUsersController {
    *
    * Vào: `id` - uuid v4 của tài khoản; body AdminUpdateUserDto (các trường của
    *      AdminCreateUserDto, đều tùy chọn). Gửi role_ids thì thay toàn bộ nhóm quyền.
-   * Ra:  PublicUser sau khi cập nhật.
+   * Ra:  AdminUser sau khi cập nhật.
    * Lỗi: 400 dữ liệu không hợp lệ, nhóm quyền không thuộc nhà xe hoặc tự khóa / tự đổi loại
    *      tài khoản đang đăng nhập;
    *      404 không tìm thấy; 409 tên đăng nhập hoặc email đã tồn tại.

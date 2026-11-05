@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { toPublicUser } from '../../mappers/user.mapper.js';
-import { UserRoleRepository } from '../../repository/user-role.repository.js';
-import { UserRepository } from '../../repository/user.repository.js';
+import { toAdminUser } from '../../mappers/admin/admin-user.mapper.js';
+import { AdminUserRoleRepository } from '../../repository/admin/admin-user-role.repository.js';
+import { AdminUserRepository } from '../../repository/admin/admin-user.repository.js';
 
 @Injectable()
 export class AdminFindUserUseCase {
   constructor(
-    private readonly users: UserRepository,
-    private readonly userRoles: UserRoleRepository,
+    private readonly users: AdminUserRepository,
+    private readonly userRoles: AdminUserRoleRepository,
   ) {}
 
   async execute(uuid: string) {
     const user = await this.users.findActiveByUuid(uuid);
-    return toPublicUser(user, await this.userRoles.findRoles(user.id));
+    return toAdminUser(user, await this.userRoles.findRoles(user.id));
   }
 }

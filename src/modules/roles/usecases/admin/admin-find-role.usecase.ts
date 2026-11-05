@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { toPublicRole } from '../../mappers/role.mapper.js';
-import { RoleRepository } from '../../repository/role.repository.js';
+import { toAdminRole } from '../../mappers/admin/admin-role.mapper.js';
+import { AdminRoleRepository } from '../../repository/admin/admin-role.repository.js';
 
 @Injectable()
 export class AdminFindRoleUseCase {
-  constructor(private readonly roles: RoleRepository) {}
+  constructor(private readonly roles: AdminRoleRepository) {}
 
   async execute(uuid: string) {
-    return toPublicRole(await this.roles.findByUuid(uuid));
+    return toAdminRole(await this.roles.findByUuid(uuid));
   }
 }

@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { PermissionRepository } from '../../../permissions/repository/permission.repository.js';
+import { AdminPermissionRepository } from '../../../permissions/repository/admin/admin-permission.repository.js';
 import { AdminUpdateRoleDto } from '../../dto/admin/admin-update-role.dto.js';
 import { Role } from '../../entities/role.entity.js';
-import { toPublicRole } from '../../mappers/role.mapper.js';
-import { RoleRepository } from '../../repository/role.repository.js';
+import { toAdminRole } from '../../mappers/admin/admin-role.mapper.js';
+import { AdminRoleRepository } from '../../repository/admin/admin-role.repository.js';
 
 /** Partial update; the company of a role cannot be changed. */
 @Injectable()
 export class AdminUpdateRoleUseCase {
   constructor(
-    private readonly roles: RoleRepository,
-    private readonly permissions: PermissionRepository,
+    private readonly roles: AdminRoleRepository,
+    private readonly permissions: AdminPermissionRepository,
   ) {}
 
   /** `actorUsername` is the username of the admin updating the role. */
@@ -31,6 +31,6 @@ export class AdminUpdateRoleUseCase {
     }
     const saved = await this.roles.save(role);
     saved.company = role.company;
-    return toPublicRole(saved);
+    return toAdminRole(saved);
   }
 }

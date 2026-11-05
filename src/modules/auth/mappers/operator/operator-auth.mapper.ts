@@ -4,7 +4,7 @@ import type {
 } from '../../../../common/services/token.service.js';
 import { grantedPermissionCodes } from '../../../../common/utils/permission-code.js';
 import { User } from '../../../users/entities/user.entity.js';
-import { toPublicUser } from '../../../users/mappers/user.mapper.js';
+import { toOperatorUser } from '../../../users/mappers/operator/operator-user.mapper.js';
 import type { OperatorAccess } from '../../usecases/operator/operator-access.js';
 
 /** `permissions` are the codes of the account's roles, carried in the access token. */
@@ -39,7 +39,7 @@ export function toOperatorLoginResponse(
   return {
     ...tokens,
     account: {
-      ...toPublicUser(user, access.roles),
+      ...toOperatorUser(user, access.roles),
       permissions: [...permissions].sort(),
     },
   };

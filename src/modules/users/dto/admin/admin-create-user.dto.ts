@@ -19,10 +19,6 @@ import {
   type AccountTypeValue,
 } from '../../../../common/constants/account.constant.js';
 
-export const USERNAME_PATTERN = /^[a-z0-9]+(?:[._-][a-z0-9]+)*$/i;
-export const USERNAME_MESSAGE =
-  'Tên đăng nhập chỉ gồm chữ thường, số, dấu chấm, gạch ngang hoặc gạch dưới.';
-
 function trim({ value }: { value: unknown }) {
   return typeof value === 'string' ? value.trim() : value;
 }
@@ -35,12 +31,16 @@ function uniqueValues({ value }: { value: unknown }) {
   return Array.isArray(value) ? [...new Set(value)] : value;
 }
 
+/** Body of POST /api/admin/users. */
 export class AdminCreateUserDto {
   @Transform(trim)
   @IsString()
   @IsNotEmpty({ message: 'Vui lòng nhập tên đăng nhập.' })
   @MaxLength(64, { message: 'Tên đăng nhập tối đa 64 ký tự.' })
-  @Matches(USERNAME_PATTERN, { message: USERNAME_MESSAGE })
+  @Matches(/^[a-z0-9]+(?:[._-][a-z0-9]+)*$/i, {
+    message:
+      'Tên đăng nhập chỉ gồm chữ thường, số, dấu chấm, gạch ngang hoặc gạch dưới.',
+  })
   username: string;
 
   @IsString()
